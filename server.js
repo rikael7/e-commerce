@@ -4,6 +4,7 @@ const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const rateLimit = require("express-rate-limit");
+const helmet = require('helmet');
 const cors = require("cors");
 
 // =================
@@ -26,9 +27,7 @@ const authRoutes = require('./routes/authRoutes');
 const products = require('./routes/products');
 
 
-const {
-    stripeWebhook
-} = require("./controllers/webhookController");
+const {stripeWebhook} = require("./controllers/webhookController");
 
 
 const path = require('path');
@@ -79,25 +78,8 @@ const pool = new Pool({
     }
 });
 
-/*
-|--------------------------------------------------------------------------
-| Webhook Stripe
-|--------------------------------------------------------------------------
-|
-| IMPORTANTE:
-| precisa vir antes do express.json()
-|
-*/
 
-app.post(
-    "/api/payment/webhook",
 
-    express.raw({
-        type: "application/json"
-    }),
-
-    stripeWebhook
-);
 
 
 
@@ -195,6 +177,16 @@ app.use('/api/payment', paymentRoutes);
 
 
 
+/*
+|--------------------------------------------------------------------------
+| Webhook Stripe
+|--------------------------------------------------------------------------
+|
+| IMPORTANTE:
+| precisa vir antes do express.json()
+|
+*/
+
 app.post(
     "/api/payment/webhook",
 
@@ -206,6 +198,9 @@ app.post(
 
     stripeWebhook
 );
+
+
+
 
 app.use(express.json());
 
