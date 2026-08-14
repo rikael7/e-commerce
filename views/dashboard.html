@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Área autenticada</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg: #0b1120;
+    --bg-soft: #111827;
+    --card: #151e32;
+    --border: #24304a;
+    --text: #e7ebf3;
+    --text-secondary: #97a3bd;
+    --accent: #4f8dfd;
+    --accent-soft: rgba(79, 141, 253, 0.12);
+    --success: #34c98f;
+    --success-soft: rgba(52, 201, 143, 0.12);
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    color: var(--text);
+    background:
+        radial-gradient(circle at 15% 0%, rgba(79, 141, 253, 0.08), transparent 45%),
+        var(--bg);
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+}
+
+.cartao {
+    width: 100%;
+    max-width: 560px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 44px 40px;
+}
+
+.selo-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--success-soft);
+    color: var(--success);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+}
+
+.selo-status::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+}
+
+.dado-registro {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 20px;
+}
+
+.descricao {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin: 0 0 28px;
+}
+
+.stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.stack span {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(79, 141, 253, 0.25);
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+.aviso {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 28px;
+}
+
+.aviso svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.botao {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.botao--primario {
+    background: var(--accent);
+    color: #05101f;
+}
+
+.botao--primario:hover { background: #6fa2fd; }
+
+.botao--secundario {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.botao--secundario:hover { border-color: var(--accent); }
+
+footer {
+    text-align: center;
+    padding: 22px 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+footer a {
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+}
+
+footer a:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<main>
+  <div class="cartao">
+    <span class="selo-status">Sessão autenticada</span>
+
+    <h1 id="saudacao">Você está logado =)</h1>
+    <p id="dataRegistro" class="dado-registro"></p>
+
+    <p class="descricao">
+        Este projeto foi construído para demonstrar, em produção, um fluxo de
+        autenticação com sessões: senhas com hash via <strong>bcrypt</strong>,
+        gerenciamento de sessão com <strong>express-session</strong> e
+        persistência em <strong>PostgreSQL</strong>. Esta página é protegida
+        no back-end e não pode ser acessada por quem não estiver autenticado.
+    </p>
+
+    <div class="stack">
+       <span>Node.js</span>
+        <span>Express</span>
+        <span>XSS</span>
+        <span>Express-validator</span>
+        <span>bcrypt</span>
+        <span>express-session</span>
+        <span>PostgreSQL</span>
+    </div>
+
+    <div class="aviso">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97a3bd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Rota protegida por middleware de sessão — qualquer tentativa de acesso sem autenticação é bloqueada no servidor.</span>
+    </div>
+
+    <div class="botoes">
+        <a class="botao botao--primario" href="https://github.com/rikael7/Sistema-de-login-com-banco-de-dados" target="_blank" rel="noopener">
+            Ver repositório e documentação
+        </a>
+        <button type="button" class="botao botao--secundario" id="botaoSair">
+            Encerrar sessão
+        </button>
+    </div>
+  </div>
+</main>
+
+<footer>
+    Desenvolvido por <a href="https://github.com/rikael7" target="_blank" rel="noopener">Rikael</a> · projeto de portfólio
+</footer>
+
+<script>
+  const saudacao = document.getElementById('saudacao');
+  const dataRegistro = document.getElementById('dataRegistro');
+
+  function formatarData(isoString) {
+    const data = new Date(isoString);
+    return data.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  async function carregarPerfil() {
+    try {
+      const resposta = await fetch('/api/me', {
+        headers: { Accept: 'application/json' },
+        credentials: 'include',
+      });
+
+      if (!resposta.ok) {
+        saudacao.textContent = 'Você está logado =)';
+        return;
+      }
+
+      const dados = await resposta.json();
+      saudacao.textContent = `Olá ${dados.nome}, você está logado =)`;
+      dataRegistro.textContent = `Registrado no site em ${formatarData(dados.registradoEm)}`;
+    } catch (erro) {
+      saudacao.textContent = 'Você está logado =)';
+    }
+  }
+
+  carregarPerfil();
+
+  document.getElementById('botaoSair').addEventListener('click', async () => {
+    try {
+      await fetch('/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (erro) {
+      console.error('Falha ao encerrar sessão:', erro);
+    } finally {
+      window.location.href = '/login';
+    }
+  });
+</script>
+
+</body>
+</html>

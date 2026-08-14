@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de chamados — Criar conta</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0b1120;
+  --bg-soft: #111827;
+  --card: #151e32;
+  --border: #24304a;
+  --text: #e7ebf3;
+  --text-secondary: #97a3bd;
+  --accent: #4f8dfd;
+  --accent-soft: rgba(79, 141, 253, 0.12);
+  --danger: #f0716f;
+  --danger-soft: rgba(240, 113, 111, 0.12);
+  --success: #34c98f;
+  --success-soft: rgba(52, 201, 143, 0.12);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(circle at 15% 0%, rgba(79, 141, 253, 0.08), transparent 45%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topbar {
+  width: 100%;
+  max-width: 1500px;
+  padding: 32px 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.logo svg { flex-shrink: 0; }
+
+.card-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px 20px 80px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 52px 44px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.eyebrow {
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 32px;
+  letter-spacing: -0.01em;
+}
+
+.field {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg-soft);
+  margin-bottom: 16px;
+  outline: none;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field::placeholder { color: var(--text-secondary); }
+
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.field.error {
+  border-color: var(--danger);
+}
+
+.error-msg {
+  color: var(--danger);
+  font-size: 13px;
+  margin: -10px 0 14px;
+  display: none;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: -10px 0 16px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.terms input {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.terms a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: #05101f;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 14px;
+  font-family: var(--font-sans);
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.btn-primary:hover { background: #6fa2fd; }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { background: #2c3a58; color: var(--text-secondary); cursor: not-allowed; }
+
+.btn-google {
+  width: 100%;
+  padding: 13px;
+  background: var(--bg-soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-family: var(--font-sans);
+  transition: background 0.15s ease;
+}
+
+.btn-google:hover { background: #1a2540; }
+
+.footer-text {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.footer-text a {
+  color: var(--accent);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.server-msg {
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 16px;
+  display: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+}
+
+.server-msg.error {
+  display: block;
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.server-msg.success {
+  display: block;
+  background: var(--success-soft);
+  color: var(--success);
+}
+</style>
+</head>
+<body>
+
+  <!-- <div class="topbar">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M14 2L25 8V20L14 26L3 20V8L14 2Z" stroke="#4f8dfd" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M3 8L14 14L25 8" stroke="#4f8dfd" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M14 14V26" stroke="#4f8dfd" stroke-width="2"/>
+      </svg>
+    </div>
+  </div> -->
+
+  <div class="card-wrap">
+    <div class="card">
+      <div class="eyebrow">Por favor, insira seus dados</div>
+      <h1>Criar uma conta</h1>
+
+      <div id="serverMsg" class="server-msg"></div>
+
+      <form id="signupForm" novalidate>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          class="field"
+          placeholder="Nome completo"
+          autocomplete="name"
+          required
+        >
+        <div class="error-msg" id="nameError">Informe seu nome completo.</div>
+
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="field"
+          placeholder="Email "
+          autocomplete="email"
+          required
+        >
+        <div class="error-msg" id="emailError">Informe um e-mail válido.</div>
+
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="field"
+          placeholder="Senha"
+          autocomplete="new-password"
+          required
+        >
+        <div class="hint">Mínimo de 8 caracteres.</div>
+        <div class="hint">Deve conter ao menos uma letra maiúscula</div>
+        <div class="error-msg" id="passwordError">A senha precisa ter no mínimo 8 caracteres.</div>
+
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          class="field"
+          placeholder="Confirmar sua senha"
+          autocomplete="new-password"
+          required
+        >
+        <div class="error-msg" id="confirmError">As senhas não coincidem.</div>
+
+        <div class="row">
+          <label class="terms">
+            <input type="checkbox" id="terms" name="terms">
+            <span>Eu concordo com os <a href="#">Termos de uso</a></span>
+          </label>
+        </div>
+        <div class="error-msg" id="termsError" style="margin-top: -20px;">Você precisa aceitar os termos para continuar.</div>
+
+        <button type="submit" class="btn-primary" id="submitBtn">Registrar</button>
+      </form>
+
+      <button type="button" class="btn-google" id="">
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.8 2.73v2.27h2.91c1.7-1.57 2.69-3.88 2.69-6.64z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.17l-2.91-2.27c-.81.54-1.84.86-3.05.86-2.34 0-4.32-1.58-5.03-3.71H.96v2.34C2.44 15.98 5.48 18 9 18z"/>
+          <path fill="#FBBC05" d="M3.97 10.71c-.18-.54-.28-1.11-.28-1.71s.1-1.17.28-1.71V4.95H.96A8.996 8.996 0 000 9c0 1.45.35 2.83.96 4.05l3.01-2.34z"/>
+          <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.95l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"/>
+        </svg>
+        Entre com sua conta Google
+      </button>
+
+      <div class="footer-text">
+        Já tem uma conta? <a href="/login">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('signupForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const termsInput = document.getElementById('terms');
+
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmError = document.getElementById('confirmError');
+    const termsError = document.getElementById('termsError');
+
+    const submitBtn = document.getElementById('submitBtn');
+    const serverMsg = document.getElementById('serverMsg');
+
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function showServerMsg(text, type) {
+      serverMsg.textContent = text;
+      serverMsg.className = 'server-msg ' + type;
+    }
+
+    function setFieldError(input, errorEl, hasError) {
+      input.classList.toggle('error', hasError);
+      errorEl.style.display = hasError ? 'block' : 'none';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      serverMsg.className = 'server-msg';
+
+      let valid = true;
+
+      const nameOk = nameInput.value.trim().length >= 2;
+      setFieldError(nameInput, nameError, !nameOk);
+      if (!nameOk) valid = false;
+
+      const emailOk = isValidEmail(emailInput.value.trim());
+      setFieldError(emailInput, emailError, !emailOk);
+      if (!emailOk) valid = false;
+
+      const passwordOk = passwordInput.value.length >= 8;
+      setFieldError(passwordInput, passwordError, !passwordOk);
+      if (!passwordOk) valid = false;
+
+      const confirmOk = confirmInput.value === passwordInput.value && confirmInput.value.length > 0;
+      setFieldError(confirmInput, confirmError, !confirmOk);
+      if (!confirmOk) valid = false;
+
+      const termsOk = termsInput.checked;
+      termsError.style.display = termsOk ? 'none' : 'block';
+      if (!termsOk) valid = false;
+
+      if (!valid) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Criando conta...';
+
+      try {
+        // Endpoint assumido: POST /register — ajuste a URL/campos conforme sua rota real
+        const res = await fetch('auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: nameInput.value.trim(),
+            email: emailInput.value.trim().toLowerCase(),
+            password: passwordInput.value
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+          showServerMsg(data.message || 'Conta criada com sucesso!', 'success');
+          // user disponível em data.user: { id, name, email }
+          window.location.href = '/login';
+        } else {
+          // Espera-se 400 para validação/email já cadastrado, 500 para erro interno
+          showServerMsg(data.error || 'Não foi possível criar a conta. Tente novamente.', 'error');
+        }
+      } catch (err) {
+        showServerMsg('Erro de conexão com o servidor. Tente novamente.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign up';
+      }
+    });
+
+    document.getElementById('googleBtn').addEventListener('click', () => {
+      window.location.href = '/auth/google';
+    });
+  </script>
+
+</body>
+</html>

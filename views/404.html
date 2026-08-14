@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Rota não encontrada</title>
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --ink:#151A23;
+    --muted:#8A93A3;
+    --accent:#2FD5C8;
+    --accent-dark:#0FA89B;
+    --bubble:#EEF0F4;
+    --shadow:#DCE1E9;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html,body{height:100%;}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:980px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:56px;
+    flex-wrap:wrap;
+  }
+
+  /* ---- Robot ---- */
+  .robot-stage{
+    position:relative;
+    width:300px;
+    height:340px;
+    flex-shrink:0;
+    animation:float 3.4s ease-in-out infinite;
+  }
+
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(-2deg);}
+    50%{transform:translateY(-14px) rotate(1deg);}
+  }
+
+  .robot-stage svg{width:100%; height:100%; display:block;}
+
+  .puff{
+    position:absolute;
+    bottom:6px;
+    left:26px;
+    width:46px;
+    height:46px;
+    background:radial-gradient(circle at 35% 35%, #E8ECF1, #C9D0DA 70%);
+    border-radius:50%;
+    opacity:0;
+    animation:puff 1.4s ease-out infinite;
+  }
+  .puff.p2{left:8px; bottom:-4px; width:34px; height:34px; animation-delay:.35s;}
+  .puff.p3{left:44px; bottom:-10px; width:26px; height:26px; animation-delay:.7s;}
+
+  @keyframes puff{
+    0%{opacity:0; transform:scale(.4) translateY(0);}
+    30%{opacity:.85;}
+    100%{opacity:0; transform:scale(1.3) translateY(24px);}
+  }
+
+  /* ---- Content ---- */
+  .content{
+    max-width:420px;
+  }
+
+  .bubble{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--bubble);
+    color:var(--ink);
+    font-weight:700;
+    letter-spacing:.04em;
+    font-size:14px;
+    padding:10px 18px;
+    border-radius:8px;
+    margin-bottom:22px;
+  }
+
+  .bubble .blip{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--accent-dark);
+  }
+
+  h1.code{
+    font-size:96px;
+    font-weight:800;
+    line-height:.9;
+    letter-spacing:-.02em;
+    color:var(--ink);
+    margin-bottom:2px;
+  }
+
+  .code span{color:var(--accent-dark);}
+
+  .error-label{
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:.18em;
+    color:var(--muted);
+    margin-bottom:20px;
+  }
+
+  .msg{
+    font-size:15px;
+    line-height:1.65;
+    color:#5A6272;
+    margin-bottom:14px;
+  }
+
+  .route{
+    font-family:'Consolas','Menlo',monospace;
+    font-size:13px;
+    background:var(--bubble);
+    color:var(--ink);
+    padding:8px 12px;
+    border-radius:6px;
+    display:inline-block;
+    margin-bottom:28px;
+    word-break:break-all;
+  }
+
+  .actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  button, a.btn{
+    font-family:inherit;
+    font-size:14px;
+    font-weight:700;
+    padding:13px 22px;
+    border-radius:8px;
+    border:2px solid var(--ink);
+    cursor:pointer;
+    text-decoration:none;
+    transition:transform .12s ease, background .15s ease, color .15s ease;
+  }
+
+  .primary{
+    background:var(--ink);
+    color:#fff;
+  }
+  .primary:hover{transform:translateY(-2px);}
+
+  .secondary{
+    background:transparent;
+    color:var(--ink);
+  }
+  .secondary:hover{background:var(--bubble);}
+
+  @media (max-width:640px){
+    .wrap{justify-content:center; text-align:center;}
+    .actions{justify-content:center;}
+    h1.code{font-size:72px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .robot-stage{animation:none;}
+    .puff{animation:none; opacity:0;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+
+    <div class="robot-stage">
+      <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
+        <!-- antenna -->
+        <line x1="150" y1="30" x2="150" y2="8" stroke="#B9C0CC" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="150" cy="6" r="6" fill="#2FD5C8"/>
+
+        <!-- head -->
+        <circle cx="150" cy="78" r="56" fill="#F3F5F8" stroke="#C9D0DA" stroke-width="3"/>
+        <!-- visor -->
+        <rect x="112" y="56" width="76" height="46" rx="12" fill="#151A23"/>
+        <g stroke="#2FD5C8" stroke-width="4" stroke-linecap="round">
+          <line x1="132" y1="70" x2="132" y2="86"/>
+          <line x1="124" y1="78" x2="140" y2="78"/>
+          <line x1="168" y1="70" x2="168" y2="86"/>
+          <line x1="160" y1="78" x2="176" y2="78"/>
+        </g>
+
+        <!-- neck -->
+        <path d="M138 128 q12 12 24 0 v14 q-12 10 -24 0 z" fill="#DCE1E9"/>
+
+        <!-- body -->
+        <path d="M96 150 q54 -26 108 0 l14 116 q-68 30 -136 0 z" fill="#F3F5F8" stroke="#C9D0DA" stroke-width="3"/>
+        <circle cx="150" cy="200" r="10" fill="#2FD5C8" opacity=".85"/>
+
+        <!-- left arm -->
+        <path d="M96 168 q-30 10 -34 60" stroke="#C9D0DA" stroke-width="14" fill="none" stroke-linecap="round"/>
+        <circle cx="60" cy="236" r="15" fill="#F3F5F8" stroke="#C9D0DA" stroke-width="3"/>
+
+        <!-- right arm -->
+        <path d="M204 168 q30 6 40 46" stroke="#C9D0DA" stroke-width="14" fill="none" stroke-linecap="round"/>
+        <circle cx="248" cy="220" r="15" fill="#F3F5F8" stroke="#C9D0DA" stroke-width="3"/>
+
+        <!-- legs (tucked, floating pose) -->
+        <path d="M126 258 q-4 34 -26 52" stroke="#C9D0DA" stroke-width="15" fill="none" stroke-linecap="round"/>
+        <circle cx="92" cy="316" r="16" fill="#F3F5F8" stroke="#C9D0DA" stroke-width="3"/>
+
+        <path d="M176 258 q6 32 22 50" stroke="#C9D0DA" stroke-width="15" fill="none" stroke-linecap="round"/>
+        <circle cx="206" cy="314" r="16" fill="#F3F5F8" stroke="#C9D0DA" stroke-width="3"/>
+      </svg>
+      <div class="puff"></div>
+      <div class="puff p2"></div>
+      <div class="puff p3"></div>
+    </div>
+
+    <div class="content">
+      <div class="bubble"><span class="blip"></span>OOPS...</div>
+
+      <h1 class="code">4<span>0</span>4</h1>
+      <div class="error-label">ERROR</div>
+
+      <p class="msg">
+        A rota que você tentou acessar não existe ou foi movida.
+        O robô já saiu procurando, mas por enquanto não achou nada por aqui.
+      </p>
+
+      <span class="route" id="routeTag"></span>
+
+      <div class="actions">
+        <a class="btn primary" href="/">Voltar ao início</a>
+        <button class="secondary" onclick="history.back()">Página anterior</button>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  document.getElementById('routeTag').textContent = window.location.pathname || '/rota-desconhecida';
+</script>
+
+</body>
+</html>
