@@ -231,7 +231,7 @@
     <div class="base-url">
       <span id="apiStatus"><span class="status-dot" id="statusDot"></span>API</span>
       <input id="baseUrl" type="text" value="" placeholder="https://seu-app.onrender.com">
-      <button class="action secondary" style="margin:0; padding:6px 10px;" onclick="checkHealth()">testar</button>
+      <button class="action secondary" style="margin:0; padding:6px 10px;" id="btnTestApi">testar</button>
     </div>
   </header>
 
@@ -239,7 +239,7 @@
     <div class="step-head"><div class="step-num">1</div><div class="step-title">Selecionar produtos</div></div>
     <div class="step-desc">Carrega de GET /api/products — clique num produto pra adicionar ao pedido</div>
     <div id="products" class="products"><div class="empty-note">clique em "testar" acima, ou "recarregar" abaixo, pra carregar os produtos</div></div>
-    <button class="action secondary" style="margin-top:12px;" onclick="loadProducts()">recarregar produtos</button>
+    <button class="action secondary" style="margin-top:12px;" id="btnReloadProducts">recarregar produtos</button>
   </div>
 
   <div class="step">
@@ -255,20 +255,20 @@
         <input id="custEmail" type="text" value="teste@teste.com">
       </div>
     </div>
-    <button class="action" id="btnCreateOrder" onclick="createOrder()">criar pedido</button>
+    <button class="action" id="btnCreateOrder">criar pedido</button>
     <div class="order-id-display" id="orderDisplay"></div>
   </div>
 
   <div class="step">
     <div class="step-head"><div class="step-num">3</div><div class="step-title">Ir para o checkout</div></div>
     <div class="step-desc">POST /api/payment/create-checkout — abre a página do Stripe em nova aba (use o cartão 4242 4242 4242 4242)</div>
-    <button class="action" id="btnCheckout" onclick="goToCheckout()" disabled>gerar link de checkout</button>
+    <button class="action" id="btnCheckout" disabled>gerar link de checkout</button>
   </div>
 
   <div class="step">
     <div class="step-head"><div class="step-num">4</div><div class="step-title">Conferir status do pedido</div></div>
     <div class="step-desc">GET /api/orders/:id — depois de pagar, o webhook deve virar o status pra "paid"</div>
-    <button class="action" id="btnRefresh" onclick="checkOrderStatus()" disabled>consultar status</button>
+    <button class="action" id="btnRefresh" disabled>consultar status</button>
     <div id="orderStatusResult" style="margin-top:10px;"></div>
   </div>
 
@@ -340,11 +340,19 @@ function renderProducts() {
       <div class="pname">${p.name}</div>
       <div class="pmeta"><span>R$ ${(p.price / 100).toFixed(2)}</span><span>estq: ${p.stock}</span></div>
       <div class="pqty">
-        <button onclick="event.stopPropagation(); changeQty(${p.id}, -1)">−</button>
+        <button type="button" data-action="dec">−</button>
         <span>${qty}</span>
-        <button onclick="event.stopPropagation(); changeQty(${p.id}, 1)">+</button>
+        <button type="button" data-action="inc">+</button>
       </div>
     `;
+    card.querySelector('[data-action="dec"]').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      changeQty(p.id, -1);
+    });
+    card.querySelector('[data-action="inc"]').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      changeQty(p.id, 1);
+    });
     el.appendChild(card);
   });
 }
@@ -439,6 +447,12 @@ window.addEventListener('DOMContentLoaded', () => {
   $('baseUrl').value = window.location.origin.startsWith('http') && window.location.protocol !== 'file:'
     ? window.location.origin
     : '';
+
+  $('btnTestApi').addEventListener('click', checkHealth);
+  $('btnReloadProducts').addEventListener('click', loadProducts);
+  $('btnCreateOrder').addEventListener('click', createOrder);
+  $('btnCheckout').addEventListener('click', goToCheckout);
+  $('btnRefresh').addEventListener('click', checkOrderStatus);
 });
 </script>
 </body>
