@@ -4,7 +4,7 @@ const stripe = new Stripe(
     process.env.STRIPE_SECRET_KEY
 );
 
-const pool = require("../config/database");
+const pool = require("../config/dbpg");
 
 
 async function createCheckoutSession(req, res) {
