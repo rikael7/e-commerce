@@ -185,7 +185,7 @@ async function createOrder(req, res) {
                     name,
                     price,
                     stock
-                FROM products
+                FROM store_products
                 WHERE id = $1
                 AND active = TRUE
                 FOR UPDATE
@@ -328,7 +328,7 @@ async function getProducts(req, res) {
                 image_url,
                 active,
                 created_at
-            FROM products
+            FROM store_products
             WHERE active = TRUE
             ORDER BY id DESC
         `);
@@ -362,7 +362,7 @@ async function getProductById(req, res) {
                 stock,
                 image_url,
                 active
-            FROM products
+            FROM store_products
             WHERE id = $1
             AND active = TRUE
         `, [id]);
