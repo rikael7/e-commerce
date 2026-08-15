@@ -150,7 +150,7 @@ app.use(
 // enviar front
 // =============
 
-app.get('/', isAuthenticated, (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
 });
 
