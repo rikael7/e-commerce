@@ -7,6 +7,11 @@ const rateLimit = require("express-rate-limit");
 const helmet = require('helmet');
 const cors = require("cors");
 
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 // =================
 // Import de Middlewares
 // =============
@@ -20,23 +25,19 @@ const validateStripeWebhook  = require('./middleware/stripeWebhook'); // middlew
 // =================
 // Import de rotas
 // =============
+const authRoutes = require("./routes/authRoutes");
+// const ordersRoutes = require("./routes/orders");
+const apiRouter = require("./routes/stripe"); // ou o nome que preferir
 
-const ordersRoutes = require("./routes/orders");
-const paymentRoutes = require("./routes/payment");
-const authRoutes = require('./routes/authRoutes');
-const products = require('./routes/products');
-const { createCheckoutSession } = require('./controllers/checkoutController');
-
+// const stripe = require("./routes/stripe")
 
 
+// =================
+// Import de controllers
+// =============
+const { handleStripeWebhook } = require("./controllers/paymentController");
 
-const {stripeWebhook} = require("./controllers/webhookController");
 
-
-const path = require('path');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
 
 // =================
 // websocket
@@ -85,7 +86,14 @@ const pool = new Pool({
 
 
 
-
+// WEBHOOK
+// Webhook do Stripe — precisa vir ANTES do express.json() global,
+// e como rota específica (não dentro do apiRouter)
+app.post(
+    '/api/payment/webhook',
+    express.raw({ type: 'application/json' }),
+    validateStripeWebhook, handleStripeWebhook
+);
 
 // =================
 // bloquear Payload gigante
@@ -172,13 +180,12 @@ app.get('/404', (req, res) => {
 
 app.use('/api', apiLimiter)
 
+// =======================
 // ROTAS API
-app.use('/auth', authRoutes);
-app.use('/api/products', products);
-app.use('/api/orders', ordersRoutes);
-app.use('/api/payment', paymentRoutes);
+// =========================
 
-app.post('/checkout', createCheckoutSession);
+app.use('/api', apiRouter);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -189,8 +196,8 @@ app.post('/checkout', createCheckoutSession);
 | precisa vir antes do express.json()
 |
 */
-
-app.post( "/webhook", express.raw({ type: "application/json" }), validateStripeWebhook,stripeWebhook);
+// app.use('/api/payment', express.raw({ type: "application/json" }), validateStripeWebhook, stripe);
+// // app.post( "/webhook", );
 
 
 
