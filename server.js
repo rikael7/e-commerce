@@ -12,6 +12,10 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+
+
+app.use(cors());
+
 // =================
 // Import de Middlewares
 // =============
@@ -181,7 +185,7 @@ app.get('/404', (req, res) => {
 });
 
 
-app.use('/api', apiLimiter)
+// app.use('/api', apiLimiter)
 
 // =======================
 // ROTAS API
