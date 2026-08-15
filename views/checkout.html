@@ -441,7 +441,7 @@ async function checkOrderStatus() {
     log(`GET /api/orders/${currentOrderId} falhou — ${e.message}`, 'err');
   }
 }
-
+// 7777777777
 // tenta usar a própria origem como base, se a página for servida pelo backend
 window.addEventListener('DOMContentLoaded', () => {
   $('baseUrl').value = window.location.origin.startsWith('http') && window.location.protocol !== 'file:'
