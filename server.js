@@ -188,7 +188,7 @@ app.use('/api/payment', paymentRoutes);
 */
 
 app.post(
-    "/api/payment/webhook",
+    "/webhook",
 
     express.raw({
         type: "application/json"
