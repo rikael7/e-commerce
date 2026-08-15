@@ -25,6 +25,9 @@ const ordersRoutes = require("./routes/orders");
 const paymentRoutes = require("./routes/payment");
 const authRoutes = require('./routes/authRoutes');
 const products = require('./routes/products');
+const { createCheckoutSession } = require('./controllers/checkoutController');
+
+
 
 
 const {stripeWebhook} = require("./controllers/webhookController");
@@ -175,7 +178,7 @@ app.use('/api/products', products);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/payment', paymentRoutes);
 
-
+app.post('/checkout', createCheckoutSession);
 
 /*
 |--------------------------------------------------------------------------
@@ -187,17 +190,7 @@ app.use('/api/payment', paymentRoutes);
 |
 */
 
-app.post(
-    "/webhook",
-
-    express.raw({
-        type: "application/json"
-    }),
-
-    validateStripeWebhook,
-
-    stripeWebhook
-);
+app.post( "/webhook", express.raw({ type: "application/json" }), validateStripeWebhook,stripeWebhook);
 
 
 
