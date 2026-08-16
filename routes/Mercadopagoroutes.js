@@ -3,6 +3,9 @@ const router = express.Router();
 const mercadopagoController = require('../controllers/mercadopagoController');
 
 
+
+router.post('/pedidos', mercadopagoController.criarPedido);
+
 // Lista os produtos disponíveis
 router.get('/produtos', mercadopagoController.listarProdutos);
 
