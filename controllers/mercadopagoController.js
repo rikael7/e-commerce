@@ -12,6 +12,10 @@ const paymentClient = new Payment(client);
 
 const mercadopagoController = {
 
+
+// =================
+  // USER CONTROLLERS
+// =============
   // Lista os produtos disponíveis para o usuário escolher
   async listarProdutos(req, res) {
     try {
@@ -198,7 +202,13 @@ const mercadopagoController = {
 
 
 
-  
+
+
+
+
+
+
+
   // Consulta manual do status de um pagamento pelo ID
   async consultarPagamento(req, res) {
     const { id } = req.params;
@@ -238,6 +248,31 @@ const mercadopagoController = {
       return res.status(500).json({ erro: 'Erro ao buscar status do pedido.' });
     }
   },
+
+
+ // ADMIN CONTROLLER
+async listarPedidos(req, res) {
+  try {
+    const resultado = await pool.query(
+      `SELECT id, valor_total, status_pagamento, payment_id, preference_id
+       FROM pedidos
+       ORDER BY id DESC`
+    );
+    return res.status(200).json(resultado.rows);
+  } catch (erro) {
+    console.error('Erro ao listar pedidos:', erro);
+    return res.status(500).json({ erro: 'Erro ao listar pedidos.' });
+  }
+},
+
+
+
 };
+
+// Listar status de todos os pedidos
+
+// Lista todos os pedidos com o status de pagamento (usado no admin)
+
+
 
 module.exports = mercadopagoController;

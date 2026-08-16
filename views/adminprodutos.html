@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Produtos</title>
+<title>Admin — Balcão</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -14,6 +14,7 @@
     --ink-soft: #4A5E52;
     --stamp: #C23B22;
     --stamp-soft: #E8531F;
+    --ok: #2F7A4D;
     --line: #C9BE9F;
     --white: #FFFDF8;
     --radius: 4px;
@@ -32,7 +33,7 @@
   }
 
   header{
-    padding: 36px 24px 20px;
+    padding: 36px 24px 0;
     text-align: center;
   }
   header .eyebrow{
@@ -61,27 +62,63 @@
     margin-top: 10px;
   }
 
+  /* ---- abas ---- */
+  nav.abas{
+    max-width: 960px;
+    margin: 26px auto 0;
+    padding: 0 24px;
+    display: flex;
+    gap: 8px;
+  }
+  .aba-btn{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 18px;
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .aba-btn.ativa{
+    background: var(--white);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .aba-btn:hover:not(.ativa){ background: var(--paper-dark); }
+
   main{
     max-width: 960px;
     margin: 0 auto;
-    padding: 10px 24px 80px;
+    padding: 0 24px 80px;
+  }
+
+  .painel{ display: none; }
+  .painel.ativo{ display: block; }
+
+  /* ---- Produtos: grid form + lista ---- */
+  #painel-produtos .grid{
     display: grid;
     grid-template-columns: 340px 1fr;
     gap: 24px;
     align-items: start;
   }
   @media (max-width: 760px){
-    main{ grid-template-columns: 1fr; }
+    #painel-produtos .grid{ grid-template-columns: 1fr; }
   }
 
   .cartao{
     background: var(--white);
     border: 1px solid var(--line);
-    border-radius: var(--radius);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
   }
-
-  /* ---- formulário ---- */
-  #form-wrap{ position: sticky; top: 20px; }
+  #painel-produtos .cartao,
+  #painel-pedidos .cartao{ border-top: none; }
+  #form-wrap .cartao{ border-radius: var(--radius); border-top: 1px solid var(--line); }
 
   .cartao-head{
     padding: 16px 18px;
@@ -89,13 +126,12 @@
     display:flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
   }
-  .cartao-head h2{
-    font-family: 'Bitter', serif;
-    font-size: 16px;
-    margin: 0;
-  }
-  .cartao-head button{
+  .cartao-head h2{ font-family: 'Bitter', serif; font-size: 16px; margin:0; }
+  .cartao-head .info{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); }
+  .cartao-head button.link{
     background: none;
     border: none;
     font-family: 'IBM Plex Mono', monospace;
@@ -103,6 +139,7 @@
     color: var(--ink-soft);
     cursor: pointer;
     text-decoration: underline;
+    padding: 0;
   }
 
   form{ padding: 18px; display: grid; gap: 14px; }
@@ -165,17 +202,7 @@
   .form-msg.erro{ color: var(--stamp); }
   .form-msg.ok{ color: var(--ink); }
 
-  /* ---- lista / ledger ---- */
-  .lista-head{
-    padding: 16px 18px;
-    border-bottom: 1px dashed var(--line);
-    display:flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-  .lista-head h2{ font-family: 'Bitter', serif; font-size: 16px; margin:0; }
-  .lista-head span{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); }
-
+  /* ---- tabelas ---- */
   table{ width: 100%; border-collapse: collapse; }
   thead th{
     text-align: left;
@@ -191,15 +218,18 @@
     padding: 12px 14px;
     font-size: 13.5px;
     border-bottom: 1px solid var(--paper-dark);
-    vertical-align: top;
+    vertical-align: middle;
   }
   tbody tr:last-child td{ border-bottom: none; }
+  tbody tr:hover{ background: var(--paper); }
   tbody tr.inativo{ opacity: 0.45; }
 
   .cel-nome .nome{ font-weight: 600; }
   .cel-nome .descricao{ font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
-  .cel-preco{ font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
-  .cel-estoque{ font-family: 'IBM Plex Mono', monospace; }
+  .cel-preco, .cel-valor{ font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .cel-estoque, .cel-id, .cel-payment{ font-family: 'IBM Plex Mono', monospace; }
+  .cel-id, .cel-payment{ color: var(--ink-soft); font-size: 12px; }
+
   .tag-inativo{
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
@@ -222,6 +252,44 @@
   }
   .link-acao.excluir{ color: var(--stamp); }
 
+  /* ---- badges de status (pedidos) ---- */
+  .filtros{ display:flex; gap: 6px; flex-wrap: wrap; }
+  .filtro-btn{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .filtro-btn.ativo{ background: var(--ink); color: var(--white); border-color: var(--ink); }
+  .filtro-btn:hover:not(.ativo){ background: var(--paper-dark); }
+
+  .badge{
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+  }
+  .badge.pendente{ background: #FBF0D9; color: #8A6A1F; border-color: #E4C685; }
+  .badge.approved,
+  .badge.aprovado{ background: #E4F1E8; color: var(--ok); border-color: #9FCBAE; }
+  .badge.rejected,
+  .badge.rejeitado,
+  .badge.cancelled,
+  .badge.cancelado{ background: #F8E4DF; color: var(--stamp); border-color: #E7ADA0; }
+  .badge.in_process,
+  .badge.em_processo{ background: #E9E4F5; color: #5A3FA3; border-color: #C6B8E8; }
+  .badge.outro{ background: var(--paper-dark); color: var(--ink-soft); border-color: var(--line); }
+
   .estado{
     padding: 30px 20px;
     font-family: 'IBM Plex Mono', monospace;
@@ -238,64 +306,130 @@
 
 <header>
   <span class="eyebrow">Painel interno</span>
-  <h1>Produtos</h1>
-  <p>cadastre, edite e remova os itens do balcão</p>
+  <h1>Balcão</h1>
+  <p>produtos e pedidos, tudo em um lugar só</p>
 </header>
 
+<nav class="abas">
+  <button type="button" class="aba-btn ativa" data-aba="produtos">Produtos</button>
+  <button type="button" class="aba-btn" data-aba="pedidos">Pedidos</button>
+</nav>
+
 <main>
-  <div id="form-wrap">
+
+  <!-- ===================== PAINEL: PRODUTOS ===================== -->
+  <section id="painel-produtos" class="painel ativo">
+    <div class="grid">
+      <div id="form-wrap">
+        <div class="cartao">
+          <div class="cartao-head">
+            <h2 id="form-titulo">Novo produto</h2>
+            <button type="button" class="link" id="btn-cancelar-edicao" hidden>cancelar edição</button>
+          </div>
+          <form id="form-produto">
+            <input type="hidden" id="produto-id">
+            <div class="campo">
+              <label for="produto-nome">Nome</label>
+              <input type="text" id="produto-nome" required maxlength="120">
+            </div>
+            <div class="campo">
+              <label for="produto-descricao">Descrição</label>
+              <textarea id="produto-descricao" maxlength="300"></textarea>
+            </div>
+            <div class="linha-dupla">
+              <div class="campo">
+                <label for="produto-preco">Preço (R$)</label>
+                <input type="number" id="produto-preco" step="0.01" min="0" required>
+              </div>
+              <div class="campo">
+                <label for="produto-estoque">Estoque</label>
+                <input type="number" id="produto-estoque" step="1" min="0" required>
+              </div>
+            </div>
+            <label class="campo-check">
+              <input type="checkbox" id="produto-ativo" checked>
+              produto ativo (visível no balcão)
+            </label>
+            <div class="acoes-form">
+              <button type="submit" class="btn btn-primario" id="btn-salvar">Adicionar produto</button>
+            </div>
+            <p class="form-msg" id="form-msg"></p>
+          </form>
+        </div>
+      </div>
+
+      <div class="cartao">
+        <div class="cartao-head">
+          <h2>Catálogo</h2>
+          <span class="info" id="contagem-produtos"></span>
+        </div>
+        <div id="produtos-wrap">
+          <div class="estado" id="estado-produtos">carregando produtos…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PAINEL: PEDIDOS ===================== -->
+  <section id="painel-pedidos" class="painel">
     <div class="cartao">
       <div class="cartao-head">
-        <h2 id="form-titulo">Novo produto</h2>
-        <button type="button" id="btn-cancelar-edicao" hidden>cancelar edição</button>
+        <h2>Todos os pedidos</h2>
+        <div class="filtros" id="filtros-pedidos">
+          <button type="button" class="filtro-btn ativo" data-status="todos">todos</button>
+          <button type="button" class="filtro-btn" data-status="pendente">pendente</button>
+          <button type="button" class="filtro-btn" data-status="approved">aprovado</button>
+          <button type="button" class="filtro-btn" data-status="rejected">rejeitado</button>
+        </div>
+        <div>
+          <span class="info" id="contagem-pedidos"></span>
+          <button type="button" class="link" id="btn-atualizar-pedidos">atualizar</button>
+        </div>
       </div>
-      <form id="form-produto">
-        <input type="hidden" id="produto-id">
-        <div class="campo">
-          <label for="produto-nome">Nome</label>
-          <input type="text" id="produto-nome" required maxlength="120">
-        </div>
-        <div class="campo">
-          <label for="produto-descricao">Descrição</label>
-          <textarea id="produto-descricao" maxlength="300"></textarea>
-        </div>
-        <div class="linha-dupla">
-          <div class="campo">
-            <label for="produto-preco">Preço (R$)</label>
-            <input type="number" id="produto-preco" step="0.01" min="0" required>
-          </div>
-          <div class="campo">
-            <label for="produto-estoque">Estoque</label>
-            <input type="number" id="produto-estoque" step="1" min="0" required>
-          </div>
-        </div>
-        <label class="campo-check">
-          <input type="checkbox" id="produto-ativo" checked>
-          produto ativo (visível no balcão)
-        </label>
-        <div class="acoes-form">
-          <button type="submit" class="btn btn-primario" id="btn-salvar">Adicionar produto</button>
-        </div>
-        <p class="form-msg" id="form-msg"></p>
-      </form>
+      <div id="pedidos-wrap">
+        <div class="estado" id="estado-pedidos">carregando pedidos…</div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="cartao">
-    <div class="lista-head">
-      <h2>Catálogo</h2>
-      <span id="contagem-lista"></span>
-    </div>
-    <div id="lista-wrap">
-      <div class="estado" id="estado-lista">carregando produtos…</div>
-    </div>
-  </div>
 </main>
 
 <script>
-  // Ajuste esta base se seu app montar as rotas em outro prefixo.
+  // Ajuste estas URLs se suas rotas estiverem montadas em outro prefixo.
   const API_PRODUTOS = '/api/produtos';
+  const API_PEDIDOS = '/api/pedidos';
 
+  function formatarMoeda(v){
+    return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+  }
+
+  // ===================== ABAS =====================
+  const abaBtns = document.querySelectorAll('.aba-btn');
+  const paineis = {
+    produtos: document.getElementById('painel-produtos'),
+    pedidos: document.getElementById('painel-pedidos'),
+  };
+
+  abaBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      abaBtns.forEach((b) => b.classList.remove('ativa'));
+      btn.classList.add('ativa');
+
+      Object.values(paineis).forEach((p) => p.classList.remove('ativo'));
+      paineis[btn.dataset.aba].classList.add('ativo');
+
+      if(btn.dataset.aba === 'pedidos' && pedidosCarregados === false){
+        carregarPedidos();
+      }
+    });
+  });
+
+  // ===================== PRODUTOS =====================
   const form = document.getElementById('form-produto');
   const formTitulo = document.getElementById('form-titulo');
   const btnSalvar = document.getElementById('btn-salvar');
@@ -309,19 +443,9 @@
   const campoEstoque = document.getElementById('produto-estoque');
   const campoAtivo = document.getElementById('produto-ativo');
 
-  const estadoListaEl = document.getElementById('estado-lista');
-  const listaWrapEl = document.getElementById('lista-wrap');
-  const contagemEl = document.getElementById('contagem-lista');
-
-  function formatarMoeda(v){
-    return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
-  function escapeHtml(str){
-    const div = document.createElement('div');
-    div.textContent = str ?? '';
-    return div.innerHTML;
-  }
+  const estadoProdutosEl = document.getElementById('estado-produtos');
+  const produtosWrapEl = document.getElementById('produtos-wrap');
+  const contagemProdutosEl = document.getElementById('contagem-produtos');
 
   function mostrarFormMsg(msg, tipo){
     formMsg.textContent = msg;
@@ -403,28 +527,27 @@
 
   async function carregarProdutos(){
     try{
-      // ?todos=1 faz o backend devolver também os produtos inativos
       const resp = await fetch(API_PRODUTOS + '?todos=1');
       if(!resp.ok) throw new Error('Falha ao buscar produtos.');
       const produtos = await resp.json();
-      renderizarLista(produtos);
+      renderizarProdutos(produtos);
     }catch(erro){
       console.error(erro);
-      estadoListaEl.className = 'estado erro';
-      estadoListaEl.textContent = 'não foi possível carregar os produtos. verifique se o servidor está no ar.';
-      listaWrapEl.innerHTML = '';
-      listaWrapEl.appendChild(estadoListaEl);
+      estadoProdutosEl.className = 'estado erro';
+      estadoProdutosEl.textContent = 'não foi possível carregar os produtos. verifique se o servidor está no ar.';
+      produtosWrapEl.innerHTML = '';
+      produtosWrapEl.appendChild(estadoProdutosEl);
     }
   }
 
-  function renderizarLista(produtos){
+  function renderizarProdutos(produtos){
     if(!Array.isArray(produtos) || produtos.length === 0){
-      listaWrapEl.innerHTML = '<div class="estado">nenhum produto cadastrado ainda</div>';
-      contagemEl.textContent = '';
+      produtosWrapEl.innerHTML = '<div class="estado">nenhum produto cadastrado ainda</div>';
+      contagemProdutosEl.textContent = '';
       return;
     }
 
-    contagemEl.textContent = produtos.length + ' item(ns)';
+    contagemProdutosEl.textContent = produtos.length + ' item(ns)';
 
     const linhas = produtos.map((p) => `
       <tr class="${p.ativo ? '' : 'inativo'}" data-id="${p.id}">
@@ -441,21 +564,16 @@
       </tr>
     `).join('');
 
-    listaWrapEl.innerHTML = `
+    produtosWrapEl.innerHTML = `
       <table>
         <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Preço</th>
-            <th>Estoque</th>
-            <th></th>
-          </tr>
+          <tr><th>Produto</th><th>Preço</th><th>Estoque</th><th></th></tr>
         </thead>
         <tbody>${linhas}</tbody>
       </table>
     `;
 
-    listaWrapEl.querySelectorAll('tr[data-id]').forEach((linha) => {
+    produtosWrapEl.querySelectorAll('tr[data-id]').forEach((linha) => {
       const id = linha.dataset.id;
       const produto = produtos.find((p) => String(p.id) === id);
 
@@ -488,6 +606,94 @@
     }
   }
 
+  // ===================== PEDIDOS =====================
+  const pedidosWrapEl = document.getElementById('pedidos-wrap');
+  const estadoPedidosEl = document.getElementById('estado-pedidos');
+  const contagemPedidosEl = document.getElementById('contagem-pedidos');
+  const filtrosPedidosEl = document.getElementById('filtros-pedidos');
+  const btnAtualizarPedidos = document.getElementById('btn-atualizar-pedidos');
+
+  let pedidos = [];
+  let filtroPedidoAtual = 'todos';
+  let pedidosCarregados = false;
+
+  function classeBadge(status){
+    if(!status) return 'outro';
+    const chave = status.toLowerCase();
+    const permitidos = ['pendente','approved','aprovado','rejected','rejeitado','cancelled','cancelado','in_process','em_processo'];
+    return permitidos.includes(chave) ? chave : 'outro';
+  }
+
+  async function carregarPedidos(){
+    estadoPedidosEl.className = 'estado';
+    estadoPedidosEl.textContent = 'carregando pedidos…';
+    pedidosWrapEl.innerHTML = '';
+    pedidosWrapEl.appendChild(estadoPedidosEl);
+
+    try{
+      const resp = await fetch(API_PEDIDOS);
+      if(!resp.ok) throw new Error('Falha ao buscar pedidos.');
+      pedidos = await resp.json();
+      pedidosCarregados = true;
+      renderizarPedidos();
+    }catch(erro){
+      console.error(erro);
+      estadoPedidosEl.className = 'estado erro';
+      estadoPedidosEl.textContent = 'não foi possível carregar os pedidos. verifique se o servidor está no ar.';
+    }
+  }
+
+  function renderizarPedidos(){
+    const filtrados = filtroPedidoAtual === 'todos'
+      ? pedidos
+      : pedidos.filter((p) => (p.status_pagamento || '').toLowerCase() === filtroPedidoAtual);
+
+    if(!Array.isArray(pedidos) || pedidos.length === 0){
+      pedidosWrapEl.innerHTML = '<div class="estado">nenhum pedido registrado ainda</div>';
+      contagemPedidosEl.textContent = '';
+      return;
+    }
+
+    if(filtrados.length === 0){
+      pedidosWrapEl.innerHTML = '<div class="estado">nenhum pedido com esse status</div>';
+      contagemPedidosEl.textContent = '0 de ' + pedidos.length;
+      return;
+    }
+
+    contagemPedidosEl.textContent = filtrados.length + ' de ' + pedidos.length;
+
+    const linhas = filtrados.map((p) => `
+      <tr>
+        <td class="cel-id">#${p.id}</td>
+        <td class="cel-valor">${formatarMoeda(p.valor_total)}</td>
+        <td><span class="badge ${classeBadge(p.status_pagamento)}">${p.status_pagamento || 'sem status'}</span></td>
+        <td class="cel-payment">${p.payment_id || '—'}</td>
+      </tr>
+    `).join('');
+
+    pedidosWrapEl.innerHTML = `
+      <table>
+        <thead>
+          <tr><th>Pedido</th><th>Valor</th><th>Status</th><th>ID do pagamento</th></tr>
+        </thead>
+        <tbody>${linhas}</tbody>
+      </table>
+    `;
+  }
+
+  filtrosPedidosEl.addEventListener('click', (evento) => {
+    const botao = evento.target.closest('.filtro-btn');
+    if(!botao) return;
+
+    filtrosPedidosEl.querySelectorAll('.filtro-btn').forEach((b) => b.classList.remove('ativo'));
+    botao.classList.add('ativo');
+    filtroPedidoAtual = botao.dataset.status;
+    renderizarPedidos();
+  });
+
+  btnAtualizarPedidos.addEventListener('click', carregarPedidos);
+
+  // ===================== INÍCIO =====================
   carregarProdutos();
 </script>
 

@@ -4,7 +4,6 @@ const mercadopagoController = require('../controllers/mercadopagoController');
 
 
 
-router.post('/pedidos', mercadopagoController.criarPedido);
 
 // Lista os produtos disponíveis
 router.get('/produtos', mercadopagoController.listarProdutos);
@@ -20,5 +19,15 @@ router.get('/pagamento/:id', mercadopagoController.consultarPagamento);
 
 // Consulta o status de pagamento salvo no banco, por pedido
 router.get('/pedido/:pedidoId/status', mercadopagoController.statusPorPedido);
+
+
+
+// ADMIN ROUTE
+// Lista todos os pedidos com o status de pagamento
+router.get('/pedidos', mercadopagoController.listarPedidos);
+
+router.post('/pedidos', mercadopagoController.criarPedido);
+
+
 
 module.exports = router;
