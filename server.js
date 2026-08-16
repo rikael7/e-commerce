@@ -28,7 +28,7 @@ const authtrue  = require('./middleware/authtrue'); // middleware para bloquear 
 // =============
 const authRoutes = require("./routes/authRoutes");
 const mercadopago = require('./routes/Mercadopagoroutes');
-
+const produtoRoutes = require('./routes/produtosRoutes')
 
 // =================
 // Import de controllers
@@ -135,7 +135,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/admin', isAuthenticated, admin, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+    res.sendFile(path.join(__dirname, 'views', 'adminprodutos.html'));
 });
 
 
@@ -164,7 +164,7 @@ app.use(express.json());
 
 // app.use('/api', mercado);
 app.use('/api/mercadopago', mercadopago);
-
+app.use('/api', produtoRoutes);                 // CRUD de produtos
 //24242
 
 

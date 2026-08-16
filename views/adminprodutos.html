@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Produtos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F7F2E7;
+    --paper-dark: #EDE4D2;
+    --ink: #1F3A2E;
+    --ink-soft: #4A5E52;
+    --stamp: #C23B22;
+    --stamp-soft: #E8531F;
+    --line: #C9BE9F;
+    --white: #FFFDF8;
+    --radius: 4px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper-dark);
+    background-image: radial-gradient(circle at 1px 1px, rgba(31,58,46,0.06) 1px, transparent 0);
+    background-size: 18px 18px;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  header{
+    padding: 36px 24px 20px;
+    text-align: center;
+  }
+  header .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stamp);
+    display:inline-block;
+    border: 1.5px solid var(--stamp);
+    padding: 3px 10px;
+    border-radius: 2px;
+    transform: rotate(-2deg);
+    margin-bottom: 14px;
+  }
+  header h1{
+    font-family: 'Bitter', serif;
+    font-weight: 900;
+    font-size: clamp(28px, 4.5vw, 44px);
+    margin: 0;
+  }
+  header p{
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  main{
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 10px 24px 80px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 760px){
+    main{ grid-template-columns: 1fr; }
+  }
+
+  .cartao{
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  /* ---- formulário ---- */
+  #form-wrap{ position: sticky; top: 20px; }
+
+  .cartao-head{
+    padding: 16px 18px;
+    border-bottom: 1px dashed var(--line);
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cartao-head h2{
+    font-family: 'Bitter', serif;
+    font-size: 16px;
+    margin: 0;
+  }
+  .cartao-head button{
+    background: none;
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  form{ padding: 18px; display: grid; gap: 14px; }
+
+  .campo{ display: grid; gap: 5px; }
+  .campo label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+  .campo input, .campo textarea{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .campo textarea{ resize: vertical; min-height: 56px; font-family: 'Inter', sans-serif; }
+  .campo input:focus, .campo textarea:focus{
+    outline: 2px solid var(--stamp-soft);
+    outline-offset: 1px;
+    border-color: var(--stamp-soft);
+  }
+
+  .linha-dupla{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .campo-check{
+    display:flex; align-items:center; gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .acoes-form{ display:flex; gap: 10px; margin-top: 4px; }
+
+  .btn{
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 11px 16px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+  }
+  .btn-primario{ background: var(--ink); color: var(--white); }
+  .btn-primario:hover{ background: #14261d; }
+  .btn-secundario{ background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
+  .btn-secundario:hover{ background: var(--paper-dark); }
+
+  .form-msg{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    min-height: 16px;
+  }
+  .form-msg.erro{ color: var(--stamp); }
+  .form-msg.ok{ color: var(--ink); }
+
+  /* ---- lista / ledger ---- */
+  .lista-head{
+    padding: 16px 18px;
+    border-bottom: 1px dashed var(--line);
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .lista-head h2{ font-family: 'Bitter', serif; font-size: 16px; margin:0; }
+  .lista-head span{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); }
+
+  table{ width: 100%; border-collapse: collapse; }
+  thead th{
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--paper-dark);
+  }
+  tbody td{
+    padding: 12px 14px;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--paper-dark);
+    vertical-align: top;
+  }
+  tbody tr:last-child td{ border-bottom: none; }
+  tbody tr.inativo{ opacity: 0.45; }
+
+  .cel-nome .nome{ font-weight: 600; }
+  .cel-nome .descricao{ font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .cel-preco{ font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .cel-estoque{ font-family: 'IBM Plex Mono', monospace; }
+  .tag-inativo{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--stamp);
+    border: 1px solid var(--stamp);
+    border-radius: 2px;
+    padding: 1px 5px;
+    margin-left: 6px;
+  }
+
+  .cel-acoes{ white-space: nowrap; text-align: right; }
+  .link-acao{
+    background:none; border:none; cursor:pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    text-decoration: underline;
+    padding: 0;
+    margin-left: 12px;
+  }
+  .link-acao.excluir{ color: var(--stamp); }
+
+  .estado{
+    padding: 30px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  .estado.erro{ color: var(--stamp); }
+
+  :focus-visible{ outline: 2px solid var(--stamp-soft); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="eyebrow">Painel interno</span>
+  <h1>Produtos</h1>
+  <p>cadastre, edite e remova os itens do balcão</p>
+</header>
+
+<main>
+  <div id="form-wrap">
+    <div class="cartao">
+      <div class="cartao-head">
+        <h2 id="form-titulo">Novo produto</h2>
+        <button type="button" id="btn-cancelar-edicao" hidden>cancelar edição</button>
+      </div>
+      <form id="form-produto">
+        <input type="hidden" id="produto-id">
+        <div class="campo">
+          <label for="produto-nome">Nome</label>
+          <input type="text" id="produto-nome" required maxlength="120">
+        </div>
+        <div class="campo">
+          <label for="produto-descricao">Descrição</label>
+          <textarea id="produto-descricao" maxlength="300"></textarea>
+        </div>
+        <div class="linha-dupla">
+          <div class="campo">
+            <label for="produto-preco">Preço (R$)</label>
+            <input type="number" id="produto-preco" step="0.01" min="0" required>
+          </div>
+          <div class="campo">
+            <label for="produto-estoque">Estoque</label>
+            <input type="number" id="produto-estoque" step="1" min="0" required>
+          </div>
+        </div>
+        <label class="campo-check">
+          <input type="checkbox" id="produto-ativo" checked>
+          produto ativo (visível no balcão)
+        </label>
+        <div class="acoes-form">
+          <button type="submit" class="btn btn-primario" id="btn-salvar">Adicionar produto</button>
+        </div>
+        <p class="form-msg" id="form-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="cartao">
+    <div class="lista-head">
+      <h2>Catálogo</h2>
+      <span id="contagem-lista"></span>
+    </div>
+    <div id="lista-wrap">
+      <div class="estado" id="estado-lista">carregando produtos…</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // Ajuste esta base se seu app montar as rotas em outro prefixo.
+  const API_PRODUTOS = '/api/produtos';
+
+  const form = document.getElementById('form-produto');
+  const formTitulo = document.getElementById('form-titulo');
+  const btnSalvar = document.getElementById('btn-salvar');
+  const btnCancelarEdicao = document.getElementById('btn-cancelar-edicao');
+  const formMsg = document.getElementById('form-msg');
+
+  const campoId = document.getElementById('produto-id');
+  const campoNome = document.getElementById('produto-nome');
+  const campoDescricao = document.getElementById('produto-descricao');
+  const campoPreco = document.getElementById('produto-preco');
+  const campoEstoque = document.getElementById('produto-estoque');
+  const campoAtivo = document.getElementById('produto-ativo');
+
+  const estadoListaEl = document.getElementById('estado-lista');
+  const listaWrapEl = document.getElementById('lista-wrap');
+  const contagemEl = document.getElementById('contagem-lista');
+
+  function formatarMoeda(v){
+    return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+  }
+
+  function mostrarFormMsg(msg, tipo){
+    formMsg.textContent = msg;
+    formMsg.className = 'form-msg ' + (tipo || '');
+  }
+
+  function entrarModoEdicao(produto){
+    campoId.value = produto.id;
+    campoNome.value = produto.nome;
+    campoDescricao.value = produto.descricao || '';
+    campoPreco.value = produto.preco;
+    campoEstoque.value = produto.estoque;
+    campoAtivo.checked = !!produto.ativo;
+
+    formTitulo.textContent = 'Editar produto';
+    btnSalvar.textContent = 'Salvar alterações';
+    btnCancelarEdicao.hidden = false;
+    mostrarFormMsg('');
+    campoNome.focus();
+  }
+
+  function sairModoEdicao(){
+    form.reset();
+    campoId.value = '';
+    campoAtivo.checked = true;
+    formTitulo.textContent = 'Novo produto';
+    btnSalvar.textContent = 'Adicionar produto';
+    btnCancelarEdicao.hidden = true;
+    mostrarFormMsg('');
+  }
+
+  btnCancelarEdicao.addEventListener('click', sairModoEdicao);
+
+  form.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+
+    const id = campoId.value;
+    const payload = {
+      nome: campoNome.value.trim(),
+      descricao: campoDescricao.value.trim(),
+      preco: Number(campoPreco.value),
+      estoque: Number(campoEstoque.value),
+      ativo: campoAtivo.checked,
+    };
+
+    if(!payload.nome){
+      mostrarFormMsg('Informe o nome do produto.', 'erro');
+      return;
+    }
+
+    btnSalvar.disabled = true;
+    mostrarFormMsg(id ? 'salvando alterações…' : 'adicionando produto…');
+
+    try{
+      const url = id ? `${API_PRODUTOS}/${id}` : API_PRODUTOS;
+      const metodo = id ? 'PUT' : 'POST';
+
+      const resp = await fetch(url, {
+        method: metodo,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const dados = await resp.json();
+
+      if(!resp.ok){
+        throw new Error(dados.erro || 'Não foi possível salvar o produto.');
+      }
+
+      mostrarFormMsg(id ? 'produto atualizado.' : 'produto adicionado.', 'ok');
+      sairModoEdicao();
+      carregarProdutos();
+    }catch(erro){
+      console.error(erro);
+      mostrarFormMsg(erro.message, 'erro');
+    }finally{
+      btnSalvar.disabled = false;
+    }
+  });
+
+  async function carregarProdutos(){
+    try{
+      // ?todos=1 faz o backend devolver também os produtos inativos
+      const resp = await fetch(API_PRODUTOS + '?todos=1');
+      if(!resp.ok) throw new Error('Falha ao buscar produtos.');
+      const produtos = await resp.json();
+      renderizarLista(produtos);
+    }catch(erro){
+      console.error(erro);
+      estadoListaEl.className = 'estado erro';
+      estadoListaEl.textContent = 'não foi possível carregar os produtos. verifique se o servidor está no ar.';
+      listaWrapEl.innerHTML = '';
+      listaWrapEl.appendChild(estadoListaEl);
+    }
+  }
+
+  function renderizarLista(produtos){
+    if(!Array.isArray(produtos) || produtos.length === 0){
+      listaWrapEl.innerHTML = '<div class="estado">nenhum produto cadastrado ainda</div>';
+      contagemEl.textContent = '';
+      return;
+    }
+
+    contagemEl.textContent = produtos.length + ' item(ns)';
+
+    const linhas = produtos.map((p) => `
+      <tr class="${p.ativo ? '' : 'inativo'}" data-id="${p.id}">
+        <td class="cel-nome">
+          <div class="nome">${escapeHtml(p.nome)}${p.ativo ? '' : '<span class="tag-inativo">inativo</span>'}</div>
+          ${p.descricao ? `<div class="descricao">${escapeHtml(p.descricao)}</div>` : ''}
+        </td>
+        <td class="cel-preco">${formatarMoeda(p.preco)}</td>
+        <td class="cel-estoque">${p.estoque}</td>
+        <td class="cel-acoes">
+          <button type="button" class="link-acao" data-acao="editar">editar</button>
+          <button type="button" class="link-acao excluir" data-acao="excluir">excluir</button>
+        </td>
+      </tr>
+    `).join('');
+
+    listaWrapEl.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Preço</th>
+            <th>Estoque</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>${linhas}</tbody>
+      </table>
+    `;
+
+    listaWrapEl.querySelectorAll('tr[data-id]').forEach((linha) => {
+      const id = linha.dataset.id;
+      const produto = produtos.find((p) => String(p.id) === id);
+
+      linha.querySelector('[data-acao="editar"]').addEventListener('click', () => {
+        entrarModoEdicao(produto);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      linha.querySelector('[data-acao="excluir"]').addEventListener('click', () => {
+        excluirProduto(id, produto.nome);
+      });
+    });
+  }
+
+  async function excluirProduto(id, nome){
+    if(!confirm(`Remover "${nome}" do catálogo?`)) return;
+
+    try{
+      const resp = await fetch(`${API_PRODUTOS}/${id}`, { method: 'DELETE' });
+      const dados = await resp.json();
+
+      if(!resp.ok){
+        throw new Error(dados.erro || 'Não foi possível remover o produto.');
+      }
+
+      carregarProdutos();
+    }catch(erro){
+      console.error(erro);
+      alert(erro.message);
+    }
+  }
+
+  carregarProdutos();
+</script>
+
+</body>
+</html>
