@@ -131,7 +131,7 @@ app.use(
 // =============
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
+    res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
 app.get('/admin', isAuthenticated, admin, (req, res) => {
