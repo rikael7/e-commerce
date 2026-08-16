@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const mercadopagoController = require('../controllers/mercadopagoController');
 
+
+// Lista os produtos disponíveis
+router.get('/produtos', mercadopagoController.listarProdutos);
+
 // Cria a preferência de pagamento e retorna o link de checkout
 router.post('/preferencia', mercadopagoController.criarPreferencia);
 
