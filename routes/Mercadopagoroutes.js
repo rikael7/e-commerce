@@ -4,7 +4,9 @@ const mercadopagoController = require('../controllers/mercadopagoController');
 
 
 
-
+// ===============
+// PUBLIC
+// ===============
 // Lista os produtos disponíveis
 router.get('/produtos', mercadopagoController.listarProdutos);
 
