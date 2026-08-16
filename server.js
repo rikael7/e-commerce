@@ -139,6 +139,10 @@ app.get('/admin', isAuthenticated, admin, (req, res) => {
 });
 
 
+app.get('/gerente', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'adminprodutos.html'));
+});
+
 // =================
 // frontend publico
 // =============
