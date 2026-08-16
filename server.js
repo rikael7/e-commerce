@@ -27,7 +27,7 @@ const authtrue  = require('./middleware/authtrue'); // middleware para bloquear 
 // Import de rotas
 // =============
 const authRoutes = require("./routes/authRoutes");
-const mercadopago = require('./routes/mercadopagoRoutes');
+const mercadopago = require('./routes/Mercadopagoroutes');
 
 
 // =================
