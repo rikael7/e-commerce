@@ -12,8 +12,6 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
-
 app.use(cors());
 
 // =================
@@ -22,7 +20,6 @@ app.use(cors());
 const { sanitizeBody, sanitizeQuery } = require('./middleware/sanitize');
 const { isAuthenticated, admin } = require('./middleware/authMiddleware');
 const authtrue  = require('./middleware/authtrue'); // middleware para bloquear usuario autenticado de entrar na rota get de register e em login
-const validateStripeWebhook  = require('./middleware/stripeWebhook'); // middleware para bloquear usuario autenticado de entrar na rota get de register e em login
 
 
 //
@@ -30,16 +27,12 @@ const validateStripeWebhook  = require('./middleware/stripeWebhook'); // middlew
 // Import de rotas
 // =============
 const authRoutes = require("./routes/authRoutes");
-// const ordersRoutes = require("./routes/orders");
-const apiRouter = require("./routes/stripe"); // ou o nome que preferir
-
-// const stripe = require("./routes/stripe")
+const mercadopago = require('./routes/mercadopagoRoutes');
 
 
 // =================
 // Import de controllers
 // =============
-const { handleStripeWebhook } = require("./controllers/paymentController");
 
 
 
@@ -64,11 +57,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL
 }));
 
-
-// =========================
-//  rate-limit
-// ==================
-
+//  rate-limie
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
@@ -77,7 +66,6 @@ const apiLimiter = rateLimit({
     }
 
 });
-
 
 // =================
 // Pool do Postgree
@@ -89,19 +77,6 @@ const pool = new Pool({
     }
 });
 
-
-
-
-
-// WEBHOOK
-// Webhook do Stripe — precisa vir ANTES do express.json() global,
-// e como rota específica (não dentro do apiRouter)
-app.post(
-    '/api/payment/webhook',
-    express.raw({ type: 'application/json' }),
-    validateStripeWebhook, handleStripeWebhook
-);
-
 // =================
 // bloquear Payload gigante
 // =============
@@ -110,7 +85,6 @@ app.use(express.urlencoded({
     extended: true, 
     limit: '100kb' 
 }));
-
 
 // =================
 // enviar front
@@ -152,7 +126,6 @@ app.use(
     })
 );
 
-
 // =================
 // enviar front
 // =============
@@ -174,53 +147,25 @@ app.get('/login', authtrue, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
-
 app.get('/register', authtrue, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
-
 
 app.get('/404', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
 
-// app.use('/api', apiLimiter)
 
 // =======================
 // ROTAS API
 // =========================
-
-app.use('/api', apiRouter);
-
-
-/*
-|--------------------------------------------------------------------------
-| Webhook Stripe
-|--------------------------------------------------------------------------
-|
-| IMPORTANTE:
-| precisa vir antes do express.json()
-|
-*/
-// app.use('/api/payment', express.raw({ type: "application/json" }), validateStripeWebhook, stripe);
-// // app.post( "/webhook", );
-
-
-
-
 app.use(express.json());
 
+// app.use('/api', mercado);
+app.use('/api/mercadopago', mercadopago);
 
-app.get("/api/health", (req, res) => {
 
-    res.json({
-        status: "online",
-        database: "PostgreSQL",
-        payment: "Stripe"
-    });
-
-});
 
 
 // Erro genérico
@@ -231,15 +176,11 @@ app.use((err, req, res, next) => {
     });
 });
 
-
 // se não encontrar nenhuma rota
 // Middleware 404 (sempre por último pois o node le de cima para baixo as rotas, caso não encontre nada vai cair nessa)
 app.use((req, res) => {
     res.redirect("/404");
 });
-
-
-
 
 
 server.listen(PORT, () => {

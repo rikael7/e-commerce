@@ -1,63 +1,56 @@
--- =====================================================
--- Schema: sistema de checkout com Stripe
--- =====================================================
+-- ============================================
+-- Schema para o sistema de pagamento (Mercado Pago)
+-- PostgreSQL
+-- ============================================
 
--- =================
--- Produtos (loja)
--- =================
-CREATE TABLE IF NOT EXISTS store_products (
+-- Catálogo de produtos
+CREATE TABLE IF NOT EXISTS produtos (
     id          SERIAL PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL,
-    description TEXT,
-    price       INTEGER NOT NULL CHECK (price >= 0), -- em centavos
-    stock       INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
-    image_url   VARCHAR(500),
-    active      BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    nome        VARCHAR(150) NOT NULL,
+    descricao   TEXT,
+    preco       NUMERIC(10, 2) NOT NULL,
+    estoque     INTEGER NOT NULL DEFAULT 0,
+    ativo       BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em   TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- =================
--- Pedidos
--- =================
-CREATE TABLE IF NOT EXISTS orders (
-    id                 SERIAL PRIMARY KEY,
-    customer_name      VARCHAR(255) NOT NULL,
-    customer_email     VARCHAR(255) NOT NULL,
-    total              INTEGER NOT NULL CHECK (total >= 0), -- em centavos
-    status             VARCHAR(20) NOT NULL DEFAULT 'pending'
-                       CHECK (status IN ('pending', 'paid', 'expired', 'canceled', 'refunded')),
-    stripe_session_id  VARCHAR(255),
-    created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- Tabela de pedidos
+-- O controller espera as colunas: preference_id, status_pagamento, payment_id, atualizado_em
+CREATE TABLE IF NOT EXISTS pedidos (
+    id              SERIAL PRIMARY KEY,
+    cliente_id      INTEGER,               -- FK para sua tabela de clientes/usuários, se existir
+    valor_total     NUMERIC(10, 2) NOT NULL,
+    status_pagamento VARCHAR(20) NOT NULL DEFAULT 'pendente',
+    preference_id   VARCHAR(100),          -- id da preferência gerada no Mercado Pago
+    payment_id      VARCHAR(100),          -- id do pagamento confirmado
+    criado_em       TIMESTAMP NOT NULL DEFAULT NOW(),
+    atualizado_em   TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
-CREATE INDEX IF NOT EXISTS idx_orders_stripe_session_id ON orders(stripe_session_id);
+-- Índice para consultas rápidas pelo preference_id (usado no fluxo de checkout)
+CREATE INDEX IF NOT EXISTS idx_pedidos_preference_id ON pedidos (preference_id);
 
--- =================
--- Itens do pedido
--- =================
-CREATE TABLE IF NOT EXISTS order_items (
-    id            SERIAL PRIMARY KEY,
-    order_id      INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-    product_id    INTEGER REFERENCES store_products(id) ON DELETE SET NULL,
-    product_name  VARCHAR(255) NOT NULL, -- snapshot do nome no momento da compra
-    quantity      INTEGER NOT NULL CHECK (quantity > 0),
-    price         INTEGER NOT NULL CHECK (price >= 0),   -- preço unitário em centavos, no momento da compra
-    subtotal      INTEGER NOT NULL CHECK (subtotal >= 0) -- price * quantity
+-- Itens de cada pedido — obrigatória, pois o mercadopagoController monta
+-- a preferência de pagamento a partir dela (nunca a partir do que o front envia)
+CREATE TABLE IF NOT EXISTS pedido_itens (
+    id          SERIAL PRIMARY KEY,
+    pedido_id   INTEGER NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
+    produto_id  INTEGER NOT NULL REFERENCES produtos(id),
+    titulo      VARCHAR(150) NOT NULL,   -- snapshot do nome no momento da compra
+    quantidade  INTEGER NOT NULL CHECK (quantidade > 0),
+    preco       NUMERIC(10, 2) NOT NULL  -- snapshot do preço no momento da compra
 );
 
-CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
-
--- =================
--- Sessões (express-session + connect-pg-simple)
--- Só precisa disso se preferir criar manualmente em vez de
--- deixar o createTableIfMissing: true do connect-pg-simple criar sozinho
--- =================
-CREATE TABLE IF NOT EXISTS sessions (
-    sid    VARCHAR NOT NULL COLLATE "default" PRIMARY KEY,
-    sess   JSON NOT NULL,
-    expire TIMESTAMP(6) NOT NULL
+-- Histórico de pagamentos (populada pelo webhook)
+-- payment_id é UNIQUE porque o controller usa ON CONFLICT (payment_id)
+CREATE TABLE IF NOT EXISTS pagamentos (
+    id          SERIAL PRIMARY KEY,
+    pedido_id   INTEGER NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
+    payment_id  VARCHAR(100) NOT NULL UNIQUE,
+    status      VARCHAR(20) NOT NULL,   -- approved, pending, rejected, in_process, refunded, etc.
+    valor       NUMERIC(10, 2),
+    metodo      VARCHAR(50),            -- ex: pix, credit_card, bolbradesco...
+    criado_em   TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_sessions_expire ON sessions(expire);
+CREATE INDEX IF NOT EXISTS idx_pagamentos_pedido_id ON pagamentos (pedido_id);
