@@ -374,12 +374,26 @@ async criarPedido(req, res) {
 
 
  // ADMIN CONTROLLER
+// async listarPedidos(req, res) {
+//   try {
+//     const resultado = await pool.query(
+//       `SELECT id, valor_total, status_pagamento, payment_id, preference_id
+//        FROM pedidos
+//        ORDER BY id DESC`
+//     );
+//     return res.status(200).json(resultado.rows);
+//   } catch (erro) {
+//     console.error('Erro ao listar pedidos:', erro);
+//     return res.status(500).json({ erro: 'Erro ao listar pedidos.' });
+//   }
+// },
 async listarPedidos(req, res) {
   try {
     const resultado = await pool.query(
-      `SELECT id, valor_total, status_pagamento, payment_id, preference_id
+      `SELECT id, valor_total, status_pagamento, payment_id, preference_id,
+              nome_completo, email, telefone, cidade, estado, criado_em
        FROM pedidos
-       ORDER BY id DESC`
+       ORDER BY criado_em DESC`
     );
     return res.status(200).json(resultado.rows);
   } catch (erro) {
@@ -387,6 +401,7 @@ async listarPedidos(req, res) {
     return res.status(500).json({ erro: 'Erro ao listar pedidos.' });
   }
 },
+
 
 
 
