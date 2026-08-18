@@ -221,7 +221,7 @@ function renderCart(){
   `;
 }
 
-async function finalizarCompra(){
+
   const carrinho = getCarrinho();
   const btn = document.getElementById("btnFinalizarCompra");
   const erroBox = document.getElementById("summaryError");
@@ -267,7 +267,33 @@ async function finalizarCompra(){
     btn.disabled = false;
     btn.textContent = textoOriginal;
   }
+
+function finalizarCompra(){
+  const carrinho = getCarrinho();
+  const btn = document.getElementById("btnFinalizarCompra");
+  const erroBox = document.getElementById("summaryError");
+
+  erroBox.classList.remove("show");
+  erroBox.textContent = "";
+
+  // Não permite prosseguir com carrinho vazio
+  if (!carrinho.length){
+    erroBox.textContent = "Seu carrinho está vazio. Adicione pelo menos um produto para continuar.";
+    erroBox.classList.add("show");
+    return;
+  }
+
+  // O pedido ainda NÃO é criado aqui.
+  // O checkout vai pegar os produtos do localStorage,
+  // coletar os dados do cliente e então criar o pedido.
+  btn.disabled = true;
+  btn.textContent = "Abrindo checkout...";
+
+  window.location.href = "/checkout";
 }
+
+
+
 
 /* ===== Recomendações (mesma API de produtos) ===== */
 function normalizeProduct(p){
