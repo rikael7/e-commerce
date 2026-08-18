@@ -30,7 +30,7 @@ const mercadopagoController = {
   },
 
   // Cria um pedido a partir dos itens escolhidos pelo usuário
-  // Body esperado: { itens: [{ produtoId, quantidade }] }
+  // Body do user esperado: { itens: [{ produtoId, quantidade }] }
   // O preço nunca vem do front — é sempre buscado na tabela produtos
   async criarPedido(req, res) {
     const { itens } = req.body;
@@ -148,7 +148,7 @@ const mercadopagoController = {
             pending: `${process.env.APP_URL}/pagamento/pendente`,
           },
           auto_return: 'approved',
-          notification_url: `${process.env.APP_URL}api/mercadopago/webhook`,
+          notification_url: `${process.env.APP_URL}/api/mercadopago/webhook`,
         },
       });
 
