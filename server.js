@@ -139,7 +139,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/cart', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'cart.html'));
+    res.sendFile(path.join(__dirname, 'views', 'singlecheckout.html'));
 });
 
 app.get('/checkout', (req, res) => {

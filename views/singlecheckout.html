@@ -1,0 +1,2002 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Carrinho — Loja do Mecânico</title>
+
+<style>
+:root{
+  --orange:#ff6a00;
+  --orange-dark:#e85d00;
+  --navy:#0c1b3a;
+  --black:#15151a;
+  --gray-bg:#f2f2f4;
+  --text:#1c1c22;
+  --muted:#6b6b76;
+  --green:#2e8b3d;
+  --red:#c0392b;
+  --border:#e6e6ea;
+  --card-radius:8px;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--gray-bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+img{
+  max-width:100%;
+  display:block;
+}
+
+button,
+input,
+select{
+  font-family:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 16px;
+}
+
+/* ================= HEADER ================= */
+
+header.topbar{
+  background:var(--orange);
+  padding:14px 0;
+  position:sticky;
+  top:0;
+  z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+}
+
+header.topbar .container{
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+
+.logo{
+  font-weight:800;
+  font-size:19px;
+  color:#fff;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+}
+
+.search-bar{
+  flex:1;
+  display:flex;
+  background:#fff;
+  border-radius:6px;
+  overflow:hidden;
+  max-width:560px;
+}
+
+.search-bar input{
+  flex:1;
+  border:0;
+  padding:10px 14px;
+  font-size:14px;
+  outline:none;
+}
+
+.search-bar button{
+  background:var(--navy);
+  border:0;
+  color:#fff;
+  padding:0 16px;
+}
+
+.header-links{
+  display:flex;
+  gap:28px;
+  color:#fff;
+  font-size:12.5px;
+  align-items:center;
+  margin-left:auto;
+}
+
+.header-links .h-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* ================= PAGE ================= */
+
+.page{
+  padding:28px 0 60px;
+}
+
+.page-title{
+  font-size:23px;
+  font-weight:800;
+  margin-bottom:20px;
+}
+
+/* ================= VIEWS ================= */
+
+.view{
+  display:none;
+}
+
+.view.active{
+  display:block;
+}
+
+/* ================= CART ================= */
+
+.cart-grid{
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:20px;
+  align-items:start;
+}
+
+.cart-list-card,
+.summary-card,
+.checkout-card{
+  background:#fff;
+  border-radius:var(--card-radius);
+  box-shadow:0 1px 5px rgba(0,0,0,.07);
+}
+
+.cart-list-card{
+  overflow:hidden;
+}
+
+.cart-list-head{
+  padding:17px 20px;
+  border-bottom:1px solid var(--border);
+  font-weight:700;
+  font-size:15px;
+}
+
+.cart-row{
+  display:flex;
+  gap:16px;
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  align-items:center;
+}
+
+.cart-row:last-child{
+  border-bottom:0;
+}
+
+.cr-thumb{
+  width:82px;
+  height:82px;
+  background:var(--gray-bg);
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  flex-shrink:0;
+  overflow:hidden;
+}
+
+.cr-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.cr-info{
+  flex:1;
+  min-width:0;
+}
+
+.cr-name{
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:6px;
+  line-height:1.3;
+}
+
+.cr-unit{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.cr-qty{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:11px;
+}
+
+.cr-qty button{
+  width:27px;
+  height:27px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:5px;
+  font-size:14px;
+}
+
+.cr-qty span{
+  min-width:20px;
+  text-align:center;
+  font-size:13px;
+  font-weight:600;
+}
+
+.cr-remove{
+  background:none;
+  border:0;
+  color:var(--red);
+  font-size:12px;
+  text-decoration:underline;
+  margin-top:8px;
+}
+
+.cr-total{
+  width:130px;
+  text-align:right;
+  font-weight:800;
+  font-size:16px;
+  flex-shrink:0;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-card{
+  background:#fff;
+  border-radius:var(--card-radius);
+  padding:55px 25px;
+  text-align:center;
+  box-shadow:0 1px 5px rgba(0,0,0,.06);
+}
+
+.empty-icon{
+  font-size:65px;
+  margin-bottom:15px;
+}
+
+.empty-card h2{
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.empty-card p{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:22px;
+}
+
+.btn-primary,
+.btn-outline{
+  display:inline-block;
+  border-radius:6px;
+  padding:12px 25px;
+  font-size:13.5px;
+  font-weight:700;
+  border:0;
+}
+
+.btn-primary{
+  background:var(--orange);
+  color:#fff;
+}
+
+.btn-outline{
+  border:1.5px solid var(--orange);
+  color:var(--orange);
+  background:#fff8f2;
+}
+
+/* ================= SUMMARY ================= */
+
+.summary-card{
+  padding:22px;
+  position:sticky;
+  top:85px;
+}
+
+.summary-card h3{
+  font-size:17px;
+  margin-bottom:16px;
+}
+
+.summary-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:13.5px;
+  color:var(--muted);
+  margin-bottom:10px;
+  gap:10px;
+}
+
+.summary-row.total{
+  color:var(--text);
+  font-size:17px;
+  font-weight:800;
+  border-top:1px solid var(--border);
+  padding-top:13px;
+  margin-top:8px;
+}
+
+.summary-checkout{
+  width:100%;
+  background:var(--orange);
+  color:#fff;
+  border:0;
+  border-radius:6px;
+  padding:13px;
+  font-size:14px;
+  font-weight:700;
+  margin-top:17px;
+}
+
+.summary-checkout:hover{
+  background:var(--orange-dark);
+}
+
+.summary-checkout:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.summary-error{
+  display:none;
+  background:#fdecea;
+  border:1px solid #f5c6cb;
+  color:var(--red);
+  border-radius:6px;
+  padding:10px;
+  margin-top:12px;
+  font-size:12.5px;
+}
+
+.summary-error.show{
+  display:block;
+}
+
+.summary-note{
+  color:var(--muted);
+  text-align:center;
+  font-size:11px;
+  margin-top:11px;
+}
+
+/* ================= CHECKOUT ================= */
+
+.checkout-layout{
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:20px;
+  align-items:start;
+}
+
+.checkout-card{
+  padding:25px;
+}
+
+.checkout-title{
+  font-size:20px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.checkout-subtitle{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:24px;
+}
+
+.steps{
+  display:flex;
+  align-items:center;
+  margin-bottom:28px;
+}
+
+.step{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:12px;
+  font-weight:700;
+  color:#aaa;
+}
+
+.step.active{
+  color:var(--orange);
+}
+
+.step-number{
+  width:27px;
+  height:27px;
+  border-radius:50%;
+  background:#eee;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.step.active .step-number{
+  background:var(--orange);
+  color:#fff;
+}
+
+.step-line{
+  flex:1;
+  height:1px;
+  background:var(--border);
+  margin:0 10px;
+}
+
+.form-section{
+  margin-bottom:25px;
+}
+
+.form-section h3{
+  font-size:15px;
+  margin-bottom:13px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+}
+
+.form-group{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.form-group.full{
+  grid-column:1/-1;
+}
+
+.form-group label{
+  font-size:12px;
+  font-weight:600;
+}
+
+.form-group input,
+.form-group select{
+  width:100%;
+  border:1px solid #dcdce1;
+  border-radius:6px;
+  padding:11px;
+  outline:none;
+  font-size:13px;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+  border-color:var(--orange);
+}
+
+.payment-box{
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:15px;
+}
+
+.payment-option{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+}
+
+.payment-option strong{
+  margin-left:auto;
+}
+
+.finish-btn{
+  width:100%;
+  border:0;
+  background:var(--orange);
+  color:#fff;
+  padding:14px;
+  border-radius:6px;
+  font-size:14px;
+  font-weight:700;
+  margin-top:8px;
+}
+
+.finish-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.checkout-error{
+  display:none;
+  margin-top:12px;
+  padding:11px;
+  border-radius:6px;
+  background:#fdecea;
+  color:var(--red);
+  border:1px solid #f5c6cb;
+  font-size:12.5px;
+}
+
+.checkout-error.show{
+  display:block;
+}
+
+/* ================= CHECKOUT SUMMARY ================= */
+
+.checkout-summary{
+  background:#fff;
+  border-radius:var(--card-radius);
+  padding:22px;
+  box-shadow:0 1px 5px rgba(0,0,0,.07);
+  position:sticky;
+  top:85px;
+}
+
+.checkout-summary h3{
+  font-size:16px;
+  margin-bottom:16px;
+}
+
+.checkout-product{
+  display:flex;
+  gap:10px;
+  padding:11px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.checkout-product-thumb{
+  width:55px;
+  height:55px;
+  border-radius:6px;
+  background:var(--gray-bg);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.checkout-product-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.checkout-product-info{
+  flex:1;
+  min-width:0;
+}
+
+.checkout-product-name{
+  font-size:12px;
+  font-weight:700;
+  line-height:1.3;
+}
+
+.checkout-product-qty{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.checkout-product-price{
+  font-size:12px;
+  font-weight:800;
+}
+
+.checkout-total{
+  display:flex;
+  justify-content:space-between;
+  font-size:17px;
+  font-weight:800;
+  margin-top:16px;
+  padding-top:13px;
+  border-top:1px solid var(--border);
+}
+
+/* ================= SUCCESS ================= */
+
+.success-card{
+  max-width:650px;
+  margin:30px auto;
+  background:#fff;
+  border-radius:10px;
+  padding:45px 30px;
+  text-align:center;
+  box-shadow:0 1px 5px rgba(0,0,0,.07);
+}
+
+.success-icon{
+  width:65px;
+  height:65px;
+  margin:0 auto 17px;
+  background:#e9f7ec;
+  color:var(--green);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+}
+
+.success-card h2{
+  font-size:22px;
+  margin-bottom:8px;
+}
+
+.success-card p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+.order-id{
+  display:inline-block;
+  background:#f5f5f7;
+  padding:10px 16px;
+  border-radius:6px;
+  margin:18px 0;
+  font-weight:700;
+  font-size:13px;
+}
+
+/* ================= LOADING ================= */
+
+.loading-screen{
+  text-align:center;
+  padding:50px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:860px){
+
+  .cart-grid,
+  .checkout-layout{
+    grid-template-columns:1fr;
+  }
+
+  .summary-card,
+  .checkout-summary{
+    position:static;
+  }
+
+  header.topbar .container{
+    flex-wrap:wrap;
+  }
+
+  .search-bar{
+    order:3;
+    flex-basis:100%;
+    max-width:none;
+  }
+
+  .header-links{
+    gap:14px;
+  }
+}
+
+@media(max-width:600px){
+
+  .cart-row{
+    align-items:flex-start;
+  }
+
+  .cr-thumb{
+    width:65px;
+    height:65px;
+  }
+
+  .cr-total{
+    width:auto;
+    font-size:14px;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .form-group.full{
+    grid-column:auto;
+  }
+
+  .steps{
+    font-size:10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="container">
+
+    <div class="logo" onclick="goToCart()">
+      🔧 Loja do Mecânico
+    </div>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Busque por produtos, marcas ou categorias">
+      <button>🔍</button>
+    </div>
+
+    <div class="header-links">
+      <div class="h-item">📋 Meus Pedidos</div>
+      <div class="h-item">👤 Entre ou Cadastre-se</div>
+    </div>
+
+  </div>
+</header>
+
+
+<main class="container page">
+
+  <!-- =====================================================
+       VIEW 1 — CARRINHO
+  ====================================================== -->
+
+  <section id="cartView" class="view active">
+
+    <div class="page-title">
+      Meu Carrinho
+    </div>
+
+    <div class="cart-grid">
+
+      <div id="cartMainArea"></div>
+
+      <aside class="summary-card">
+
+        <h3>Resumo do pedido</h3>
+
+        <div id="summaryBody"></div>
+
+      </aside>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       VIEW 2 — CHECKOUT
+  ====================================================== -->
+
+  <section id="checkoutView" class="view">
+
+    <div class="page-title">
+      Finalizar compra
+    </div>
+
+    <div class="checkout-layout">
+
+      <div class="checkout-card">
+
+        <div class="checkout-title">
+          Checkout
+        </div>
+
+        <div class="checkout-subtitle">
+          Preencha seus dados para continuar com o pedido.
+        </div>
+
+
+        <div class="steps">
+
+          <div class="step active">
+            <span class="step-number">1</span>
+            Dados
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="step active">
+            <span class="step-number">2</span>
+            Pagamento
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="step">
+            <span class="step-number">3</span>
+            Confirmação
+          </div>
+
+        </div>
+
+
+        <!-- DADOS DO CLIENTE -->
+
+        <div class="form-section">
+
+          <h3>Dados do comprador</h3>
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Nome completo</label>
+              <input
+                id="clienteNome"
+                type="text"
+                placeholder="Seu nome completo"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>CPF</label>
+              <input
+                id="clienteCpf"
+                type="text"
+                placeholder="000.000.000-00"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>E-mail</label>
+              <input
+                id="clienteEmail"
+                type="email"
+                placeholder="seu@email.com"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Telefone</label>
+              <input
+                id="clienteTelefone"
+                type="text"
+                placeholder="(00) 00000-0000"
+              >
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ENDEREÇO -->
+
+        <div class="form-section">
+
+          <h3>Endereço de entrega</h3>
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>CEP</label>
+              <input
+                id="clienteCep"
+                type="text"
+                placeholder="00000-000"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Estado</label>
+              <select id="clienteEstado">
+                <option value="">Selecione</option>
+                <option>AC</option>
+                <option>AL</option>
+                <option>AP</option>
+                <option>AM</option>
+                <option>BA</option>
+                <option>CE</option>
+                <option>DF</option>
+                <option>ES</option>
+                <option>GO</option>
+                <option>MA</option>
+                <option>MT</option>
+                <option>MS</option>
+                <option>MG</option>
+                <option>PA</option>
+                <option>PB</option>
+                <option>PR</option>
+                <option>PE</option>
+                <option>PI</option>
+                <option>RJ</option>
+                <option>RN</option>
+                <option>RS</option>
+                <option>RO</option>
+                <option>RR</option>
+                <option>SC</option>
+                <option>SP</option>
+                <option>SE</option>
+                <option>TO</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <label>Endereço</label>
+              <input
+                id="clienteEndereco"
+                type="text"
+                placeholder="Rua, avenida..."
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Número</label>
+              <input
+                id="clienteNumero"
+                type="text"
+                placeholder="Número"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Complemento</label>
+              <input
+                id="clienteComplemento"
+                type="text"
+                placeholder="Apartamento, casa..."
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Bairro</label>
+              <input
+                id="clienteBairro"
+                type="text"
+                placeholder="Bairro"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Cidade</label>
+              <input
+                id="clienteCidade"
+                type="text"
+                placeholder="Cidade"
+              >
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- PAGAMENTO -->
+
+        <div class="form-section">
+
+          <h3>Forma de pagamento</h3>
+
+          <div class="payment-box">
+
+            <label class="payment-option">
+
+              <input
+                type="radio"
+                name="pagamento"
+                value="mercadopago"
+                checked
+              >
+
+              <span>
+                Mercado Pago
+              </span>
+
+              <strong>🔒 Seguro</strong>
+
+            </label>
+
+          </div>
+
+        </div>
+
+
+        <button
+          id="btnConfirmarPedido"
+          class="finish-btn"
+          onclick="confirmarCheckout()"
+        >
+          Continuar para pagamento
+        </button>
+
+        <div
+          id="checkoutError"
+          class="checkout-error"
+        ></div>
+
+      </div>
+
+
+      <!-- RESUMO CHECKOUT -->
+
+      <aside class="checkout-summary">
+
+        <h3>Resumo da compra</h3>
+
+        <div id="checkoutProducts"></div>
+
+        <div class="checkout-total">
+
+          <span>Total</span>
+
+          <span id="checkoutTotal">
+            R$ 0,00
+          </span>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       VIEW 3 — PEDIDO CRIADO
+  ====================================================== -->
+
+  <section id="successView" class="view">
+
+    <div class="success-card">
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+      <h2>
+        Pedido criado com sucesso!
+      </h2>
+
+      <p>
+        Seu pedido foi registrado e está pronto para continuar
+        para o pagamento.
+      </p>
+
+      <div class="order-id">
+        Pedido #<span id="successOrderId"></span>
+      </div>
+
+      <br>
+
+      <button
+        class="btn-primary"
+        onclick="goToCart()"
+      >
+        Voltar para a loja
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script>
+
+/* =========================================================
+   CONFIGURAÇÃO
+========================================================= */
+
+const CART_KEY = "carrinho";
+
+const API_BASE = "";
+
+const PRODUCTS_ENDPOINT =
+  API_BASE + "/api/mercadopago/produtos";
+
+const PEDIDOS_ENDPOINT =
+  API_BASE + "/api/mercadopago/pedidos";
+
+
+/* =========================================================
+   ESTADO DA SPA
+========================================================= */
+
+const SPA = {
+
+  view: "cart",
+
+  pedidoId: null,
+
+  carrinho: []
+
+};
+
+
+/* =========================================================
+   UTILITÁRIOS
+========================================================= */
+
+function formatBRL(valor){
+
+  const n = Number(valor) || 0;
+
+  return n.toLocaleString(
+    "pt-BR",
+    {
+      style:"currency",
+      currency:"BRL"
+    }
+  );
+
+}
+
+
+function getCarrinho(){
+
+  try{
+
+    const data =
+      JSON.parse(
+        localStorage.getItem(CART_KEY)
+      );
+
+    return Array.isArray(data)
+      ? data
+      : [];
+
+  }catch{
+
+    return [];
+
+  }
+
+}
+
+
+function salvarCarrinho(carrinho){
+
+  localStorage.setItem(
+    CART_KEY,
+    JSON.stringify(carrinho)
+  );
+
+  SPA.carrinho = carrinho;
+
+  renderCart();
+
+}
+
+
+function calcularSubtotal(){
+
+  return SPA.carrinho.reduce(
+    (total,item) =>
+      total +
+      (Number(item.preco) || 0) *
+      (Number(item.quantidade) || 0),
+    0
+  );
+
+}
+
+
+/* =========================================================
+   TROCA DE TELAS — SPA
+========================================================= */
+
+function showView(view){
+
+  document
+    .querySelectorAll(".view")
+    .forEach(el =>
+      el.classList.remove("active")
+    );
+
+  const target =
+    document.getElementById(view + "View");
+
+  if(target){
+
+    target.classList.add("active");
+
+  }
+
+  SPA.view = view;
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================================================
+   VOLTAR PARA CARRINHO
+========================================================= */
+
+function goToCart(){
+
+  SPA.carrinho = getCarrinho();
+
+  renderCart();
+
+  showView("cart");
+
+}
+
+
+/* =========================================================
+   ALTERAR QUANTIDADE
+========================================================= */
+
+function alterarQuantidade(id,delta){
+
+  const carrinho =
+    getCarrinho();
+
+  const item =
+    carrinho.find(
+      i => String(i.id) === String(id)
+    );
+
+  if(!item) return;
+
+  item.quantidade =
+    Number(item.quantidade) + delta;
+
+  if(item.quantidade <= 0){
+
+    removerDoCarrinho(id);
+
+    return;
+
+  }
+
+  salvarCarrinho(carrinho);
+
+}
+
+
+/* =========================================================
+   REMOVER
+========================================================= */
+
+function removerDoCarrinho(id){
+
+  const carrinho =
+    getCarrinho().filter(
+      item =>
+        String(item.id) !== String(id)
+    );
+
+  salvarCarrinho(carrinho);
+
+}
+
+
+/* =========================================================
+   RENDER CARRINHO
+========================================================= */
+
+function renderCart(){
+
+  SPA.carrinho =
+    getCarrinho();
+
+  const mainArea =
+    document.getElementById(
+      "cartMainArea"
+    );
+
+  const summaryBody =
+    document.getElementById(
+      "summaryBody"
+    );
+
+  if(!SPA.carrinho.length){
+
+    mainArea.innerHTML = `
+
+      <div class="empty-card">
+
+        <div class="empty-icon">
+          🛍️
+        </div>
+
+        <h2>
+          Seu carrinho está vazio
+        </h2>
+
+        <p>
+          Encontre os produtos que deseja
+          adicionar ao carrinho.
+        </p>
+
+        <button
+          class="btn-outline"
+          onclick="goToStore()"
+        >
+          Conferir produtos
+        </button>
+
+      </div>
+
+    `;
+
+    summaryBody.innerHTML = `
+
+      <p style="
+        color:var(--muted);
+        font-size:13px;
+        line-height:1.5;
+      ">
+        Assim que adicionar produtos ao
+        carrinho, aqui você encontrará o
+        resumo do seu pedido.
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+
+  const totalItens =
+    SPA.carrinho.reduce(
+      (total,item) =>
+        total +
+        Number(item.quantidade || 0),
+      0
+    );
+
+
+  const subtotal =
+    calcularSubtotal();
+
+
+  mainArea.innerHTML = `
+
+    <div class="cart-list-card">
+
+      <div class="cart-list-head">
+
+        Meu carrinho
+        (${totalItens}
+        ${totalItens === 1 ? "item" : "itens"})
+
+      </div>
+
+
+      ${SPA.carrinho.map(item => `
+
+        <div class="cart-row">
+
+          <div class="cr-thumb">
+
+            ${
+              item.imagem
+
+              ? `
+
+                <img
+                  src="${escapeHTML(item.imagem)}"
+                  alt="${escapeHTML(item.nome)}"
+                  onerror="
+                    this.style.display='none';
+                    this.parentElement.innerHTML='🔧';
+                  "
+                >
+
+              `
+
+              : "🔧"
+            }
+
+          </div>
+
+
+          <div class="cr-info">
+
+            <div class="cr-name">
+
+              ${escapeHTML(item.nome)}
+
+            </div>
+
+
+            <div class="cr-unit">
+
+              ${formatBRL(item.preco)}
+              / unidade
+
+            </div>
+
+
+            <div class="cr-qty">
+
+              <button
+                onclick="alterarQuantidade('${escapeJS(item.id)}',-1)"
+              >
+                −
+              </button>
+
+              <span>
+                ${item.quantidade}
+              </span>
+
+              <button
+                onclick="alterarQuantidade('${escapeJS(item.id)}',1)"
+              >
+                +
+              </button>
+
+            </div>
+
+
+            <button
+              class="cr-remove"
+              onclick="removerDoCarrinho('${escapeJS(item.id)}')"
+            >
+              Remover
+            </button>
+
+          </div>
+
+
+          <div class="cr-total">
+
+            ${formatBRL(
+              Number(item.preco) *
+              Number(item.quantidade)
+            )}
+
+          </div>
+
+        </div>
+
+      `).join("")}
+
+    </div>
+
+  `;
+
+
+  summaryBody.innerHTML = `
+
+    <div class="summary-row">
+
+      <span>
+        Subtotal
+      </span>
+
+      <span>
+        ${formatBRL(subtotal)}
+      </span>
+
+    </div>
+
+
+    <div class="summary-row">
+
+      <span>
+        Frete
+      </span>
+
+      <span>
+        Calculado no próximo passo
+      </span>
+
+    </div>
+
+
+    <div class="summary-row total">
+
+      <span>
+        Total
+      </span>
+
+      <span>
+        ${formatBRL(subtotal)}
+      </span>
+
+    </div>
+
+
+    <button
+      class="summary-checkout"
+      onclick="irParaCheckout()"
+    >
+      Finalizar compra
+    </button>
+
+
+    <div
+      id="summaryError"
+      class="summary-error"
+    ></div>
+
+
+    <div class="summary-note">
+
+      Pagamento processado via Mercado Pago
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   IR PARA CHECKOUT
+========================================================= */
+
+function irParaCheckout(){
+
+  const carrinho =
+    getCarrinho();
+
+  if(!carrinho.length){
+
+    alert(
+      "Seu carrinho está vazio."
+    );
+
+    renderCart();
+
+    return;
+
+  }
+
+
+  SPA.carrinho =
+    carrinho;
+
+
+  renderCheckout();
+
+
+  showView("checkout");
+
+}
+
+
+/* =========================================================
+   RENDER CHECKOUT
+========================================================= */
+
+function renderCheckout(){
+
+  const container =
+    document.getElementById(
+      "checkoutProducts"
+    );
+
+  const total =
+    calcularSubtotal();
+
+
+  container.innerHTML =
+    SPA.carrinho.map(item => `
+
+      <div class="checkout-product">
+
+        <div class="checkout-product-thumb">
+
+          ${
+            item.imagem
+
+            ? `
+
+              <img
+                src="${escapeHTML(item.imagem)}"
+                alt="${escapeHTML(item.nome)}"
+                onerror="
+                  this.style.display='none';
+                  this.parentElement.innerHTML='🔧';
+                "
+              >
+
+            `
+
+            : "🔧"
+          }
+
+        </div>
+
+
+        <div class="checkout-product-info">
+
+          <div class="checkout-product-name">
+
+            ${escapeHTML(item.nome)}
+
+          </div>
+
+          <div class="checkout-product-qty">
+
+            Quantidade:
+            ${item.quantidade}
+
+          </div>
+
+        </div>
+
+
+        <div class="checkout-product-price">
+
+          ${formatBRL(
+            Number(item.preco) *
+            Number(item.quantidade)
+          )}
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+
+  document.getElementById(
+    "checkoutTotal"
+  ).textContent =
+    formatBRL(total);
+
+}
+
+
+/* =========================================================
+   CONFIRMAR CHECKOUT
+========================================================= */
+
+async function confirmarCheckout(){
+
+  const carrinho =
+    getCarrinho();
+
+  const btn =
+    document.getElementById(
+      "btnConfirmarPedido"
+    );
+
+  const errorBox =
+    document.getElementById(
+      "checkoutError"
+    );
+
+
+  errorBox.classList.remove(
+    "show"
+  );
+
+  errorBox.textContent = "";
+
+
+  /*
+   * IMPORTANTE:
+   *
+   * O pedido continua sendo criado
+   * exatamente pelo endpoint que você
+   * já utilizava no carrinho.
+   */
+
+  if(!carrinho.length){
+
+    mostrarErroCheckout(
+      "Seu carrinho está vazio."
+    );
+
+    showView("cart");
+
+    return;
+
+  }
+
+
+  /*
+   * Validação básica dos dados
+   */
+
+  const nome =
+    document.getElementById(
+      "clienteNome"
+    ).value.trim();
+
+  const cpf =
+    document.getElementById(
+      "clienteCpf"
+    ).value.trim();
+
+  const email =
+    document.getElementById(
+      "clienteEmail"
+    ).value.trim();
+
+  const telefone =
+    document.getElementById(
+      "clienteTelefone"
+    ).value.trim();
+
+  const cep =
+    document.getElementById(
+      "clienteCep"
+    ).value.trim();
+
+  const endereco =
+    document.getElementById(
+      "clienteEndereco"
+    ).value.trim();
+
+  const numero =
+    document.getElementById(
+      "clienteNumero"
+    ).value.trim();
+
+  const bairro =
+    document.getElementById(
+      "clienteBairro"
+    ).value.trim();
+
+  const cidade =
+    document.getElementById(
+      "clienteCidade"
+    ).value.trim();
+
+  const estado =
+    document.getElementById(
+      "clienteEstado"
+    ).value;
+
+
+  if(
+    !nome ||
+    !cpf ||
+    !email ||
+    !telefone ||
+    !cep ||
+    !endereco ||
+    !numero ||
+    !bairro ||
+    !cidade ||
+    !estado
+  ){
+
+    mostrarErroCheckout(
+      "Preencha todos os campos obrigatórios."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * MESMO PAYLOAD DA SUA FUNÇÃO ANTERIOR
+   */
+
+  const itens =
+    carrinho.map(item => ({
+
+      produtoId:
+        Number(item.id),
+
+      quantidade:
+        Number(item.quantidade)
+
+    }));
+
+
+  btn.disabled = true;
+
+  btn.textContent =
+    "Criando pedido...";
+
+
+  try{
+
+    const res =
+      await fetch(
+        PEDIDOS_ENDPOINT,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+            itens
+          })
+        }
+      );
+
+
+    const data =
+      await res.json();
+
+
+    if(!res.ok){
+
+      throw new Error(
+        data.erro ||
+        "Não foi possível criar o pedido."
+      );
+
+    }
+
+
+    /*
+     * PEDIDO CRIADO
+     */
+
+    SPA.pedidoId =
+      data.pedidoId;
+
+
+    /*
+     * Agora que o backend confirmou
+     * o pedido, limpamos o carrinho.
+     */
+
+    localStorage.removeItem(
+      CART_KEY
+    );
+
+    SPA.carrinho = [];
+
+
+    /*
+     * Simula a próxima etapa da SPA.
+     */
+
+    mostrarPedidoCriado();
+
+
+  }catch(err){
+
+    console.error(
+      "Erro ao criar pedido:",
+      err
+    );
+
+
+    mostrarErroCheckout(
+      err.message ||
+      "Erro ao finalizar compra."
+    );
+
+
+    btn.disabled = false;
+
+    btn.textContent =
+      "Continuar para pagamento";
+
+  }
+
+}
+
+
+/* =========================================================
+   PEDIDO CRIADO
+========================================================= */
+
+function mostrarPedidoCriado(){
+
+  document.getElementById(
+    "successOrderId"
+  ).textContent =
+    SPA.pedidoId;
+
+
+  showView("success");
+
+}
+
+
+/* =========================================================
+   ERRO CHECKOUT
+========================================================= */
+
+function mostrarErroCheckout(message){
+
+  const box =
+    document.getElementById(
+      "checkoutError"
+    );
+
+  box.textContent =
+    message;
+
+  box.classList.add(
+    "show"
+  );
+
+}
+
+
+/* =========================================================
+   VOLTAR PARA LOJA
+========================================================= */
+
+function goToStore(){
+
+  /*
+   * Aqui você pode colocar sua rota
+   * real da loja.
+   */
+
+  window.location.href =
+    "/";
+
+}
+
+
+/* =========================================================
+   SEGURANÇA BÁSICA PARA HTML
+========================================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function escapeJS(value){
+
+  return String(value ?? "")
+    .replaceAll("\\","\\\\")
+    .replaceAll("'","\\'")
+    .replaceAll('"','\\"');
+
+}
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+function init(){
+
+  SPA.carrinho =
+    getCarrinho();
+
+  renderCart();
+
+  showView("cart");
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
+```
