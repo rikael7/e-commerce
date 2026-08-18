@@ -142,9 +142,9 @@
     padding: 0;
   }
 
-  form{ padding: 18px; display: grid; gap: 14px; }
+  form{ padding: 18px; display: grid; gap: 14px; min-width: 0; }
 
-  .campo{ display: grid; gap: 5px; }
+  .campo{ display: grid; gap: 5px; min-width: 0; }
   .campo label{
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
@@ -153,6 +153,8 @@
     color: var(--ink-soft);
   }
   .campo input, .campo textarea{
+    width: 100%;
+    min-width: 0;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     padding: 9px 10px;
@@ -168,7 +170,7 @@
     border-color: var(--stamp-soft);
   }
 
-  .linha-dupla{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .linha-dupla{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
 
   .campo-check{
     display:flex; align-items:center; gap: 8px;
@@ -226,6 +228,23 @@
   .cel-nome .nome{ font-weight: 600; }
   .cel-nome .descricao{ font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
   .cel-preco{ font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .preco-antigo{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    text-decoration: line-through;
+    margin-bottom: 2px;
+  }
+  .preco-atual{ display: flex; align-items: center; gap: 8px; }
+  .badge-desconto{
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--white);
+    background: var(--ok);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
   .cel-estoque, .cel-id{ font-family: 'IBM Plex Mono', monospace; }
 
   .tag-inativo{
@@ -303,6 +322,12 @@
   .linha-pedido.aberta{ background: var(--paper); }
 
   .cel-toggle{ width: 22px; text-align: center; }
+  .cel-data-criacao{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
   .seta{
     display: inline-block;
     font-family: 'IBM Plex Mono', monospace;
@@ -412,9 +437,13 @@
                 <input type="number" id="produto-preco" step="0.01" min="0" required>
               </div>
               <div class="campo">
-                <label for="produto-estoque">Estoque</label>
-                <input type="number" id="produto-estoque" step="1" min="0" required>
+                <label for="produto-preco-antigo">Preço antigo (R$)</label>
+                <input type="number" id="produto-preco-antigo" step="0.01" min="0" placeholder="opcional">
               </div>
+            </div>
+            <div class="campo">
+              <label for="produto-estoque">Estoque</label>
+              <input type="number" id="produto-estoque" step="1" min="0" required>
             </div>
             <label class="campo-check">
               <input type="checkbox" id="produto-ativo" checked>
@@ -521,6 +550,7 @@
   const campoNome = document.getElementById('produto-nome');
   const campoDescricao = document.getElementById('produto-descricao');
   const campoPreco = document.getElementById('produto-preco');
+  const campoPrecoAntigo = document.getElementById('produto-preco-antigo');
   const campoEstoque = document.getElementById('produto-estoque');
   const campoAtivo = document.getElementById('produto-ativo');
 
@@ -538,6 +568,7 @@
     campoNome.value = produto.nome;
     campoDescricao.value = produto.descricao || '';
     campoPreco.value = produto.preco;
+    campoPrecoAntigo.value = produto.preco_antigo || '';
     campoEstoque.value = produto.estoque;
     campoAtivo.checked = !!produto.ativo;
 
@@ -568,12 +599,18 @@
       nome: campoNome.value.trim(),
       descricao: campoDescricao.value.trim(),
       preco: Number(campoPreco.value),
+      precoAntigo: campoPrecoAntigo.value ? Number(campoPrecoAntigo.value) : null,
       estoque: Number(campoEstoque.value),
       ativo: campoAtivo.checked,
     };
 
     if(!payload.nome){
       mostrarFormMsg('Informe o nome do produto.', 'erro');
+      return;
+    }
+
+    if(payload.precoAntigo !== null && payload.precoAntigo <= payload.preco){
+      mostrarFormMsg('O preço antigo deve ser maior que o preço atual.', 'erro');
       return;
     }
 
@@ -636,7 +673,13 @@
           <div class="nome">${escapeHtml(p.nome)}${p.ativo ? '' : '<span class="tag-inativo">inativo</span>'}</div>
           ${p.descricao ? `<div class="descricao">${escapeHtml(p.descricao)}</div>` : ''}
         </td>
-        <td class="cel-preco">${formatarMoeda(p.preco)}</td>
+        <td class="cel-preco">
+          ${p.desconto_percentual ? `<div class="preco-antigo">de ${formatarMoeda(p.preco_antigo)}</div>` : ''}
+          <div class="preco-atual">
+            ${formatarMoeda(p.preco)}
+            ${p.desconto_percentual ? `<span class="badge-desconto">↓ ${p.desconto_percentual}%</span>` : ''}
+          </div>
+        </td>
         <td class="cel-estoque">${p.estoque}</td>
         <td class="cel-acoes">
           <button type="button" class="link-acao" data-acao="editar">editar</button>
@@ -756,9 +799,10 @@
           </td>
           <td class="cel-preco">${formatarMoeda(p.valor_total)}</td>
           <td><span class="badge ${classeBadge(p.status_pagamento)}">${p.status_pagamento || 'sem status'}</span></td>
+          <td class="cel-data-criacao">${formatarData(p.criado_em)}</td>
         </tr>
         <tr class="linha-detalhe ${aberta ? 'aberta' : ''}" data-detalhe-id="${p.id}">
-          <td colspan="5">
+          <td colspan="6">
             <div class="detalhe-conteudo">
               <div class="detalhe-secao">
                 <div class="detalhe-titulo">Comprador</div>
@@ -867,6 +911,7 @@
             <th>Cliente</th>
             <th>Valor</th>
             <th>Status</th>
+            <th>Data</th>
           </tr>
         </thead>
         <tbody>${linhas}</tbody>

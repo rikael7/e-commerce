@@ -17,17 +17,32 @@ const mercadopagoController = {
   // USER CONTROLLERS
 // =============
   // Lista os produtos disponíveis para o usuário escolher
+  // async listarProdutos(req, res) {
+  //   try {
+  //     const resultado = await pool.query(
+  //       `SELECT id, nome, descricao, preco, estoque, imagem_url FROM produtos WHERE ativo = TRUE ORDER BY nome`
+  //     );
+  //     return res.status(200).json(resultado.rows);
+  //   } catch (erro) {
+  //     console.error('Erro ao listar produtos:', erro);
+  //     return res.status(500).json({ erro: 'Erro ao listar produtos.' });
+  //   }
+  // },
   async listarProdutos(req, res) {
-    try {
-      const resultado = await pool.query(
-        `SELECT id, nome, descricao, preco, estoque, imagem_url FROM produtos WHERE ativo = TRUE ORDER BY nome`
-      );
-      return res.status(200).json(resultado.rows);
-    } catch (erro) {
-      console.error('Erro ao listar produtos:', erro);
-      return res.status(500).json({ erro: 'Erro ao listar produtos.' });
-    }
-  },
+  try {
+    const resultado = await pool.query(
+      `SELECT id, nome, descricao, preco, preco_antigo, desconto_percentual, estoque
+       FROM produtos
+       WHERE ativo = TRUE
+       ORDER BY nome`
+    );
+    return res.status(200).json(resultado.rows);
+  } catch (erro) {
+    console.error('Erro ao listar produtos:', erro);
+    return res.status(500).json({ erro: 'Erro ao listar produtos.' });
+  }
+},
+
 
   // Cria um pedido a partir dos itens escolhidos pelo usuário
   // Body do user esperado: { itens: [{ produtoId, quantidade }] }
