@@ -142,9 +142,9 @@ app.get('/cart', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'singlecheckout.html'));
 });
 
-app.get('/checkout', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
-});
+// app.get('/checkout', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
+// });
 
 
 app.get('/pagamento/sucesso', (req, res) => {
@@ -200,7 +200,7 @@ app.use(express.json());
 // app.use('/api', mercado);
 app.use('/api/mercadopago', mercadopago);
 app.use('/api', produtoRoutes);                 // CRUD de produtos
-//24242
+
 
 
 // Erro genérico
