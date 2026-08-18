@@ -130,7 +130,25 @@ app.use(
 // enviar front
 // =============
 
+// servir imagens
+app.use('/imagens', express.static(path.join(__dirname, 'views/imagens')));
+
+
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'loja.html'));
+});
+
+app.get('/cart', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'cart.html'));
+});
+
+app.get('/checkout', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
+});
+
+
+
+app.get('/caixa', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Console de teste — Checkout</title>
+<style>
+  :root {
+    --bg: #0d1210;
+    --panel: #141b18;
+    --panel-border: #24312c;
+    --ink: #d9e6df;
+    --ink-dim: #7f9389;
+    --accent: #4ee6a3;
+    --accent-dim: #2c8f66;
+    --warn: #e6b34e;
+    --err: #e65858;
+    --mono: "IBM Plex Mono", "Consolas", "SF Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 32px 20px 80px;
+  }
+
+  .wrap { max-width: 920px; margin: 0 auto; }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 0;
+    color: var(--ink);
+  }
+  header h1 span { color: var(--accent); }
+
+  .status-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ink-dim);
+    margin-right: 6px;
+  }
+  .status-dot.ok { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .status-dot.bad { background: var(--err); box-shadow: 0 0 6px var(--err); }
+
+  .base-url {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+  .base-url input {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    width: 260px;
+  }
+  .base-url input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+
+  .step {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .step-num {
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: #06120c;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .step-desc { font-size: 12px; color: var(--ink-dim); margin: -8px 0 14px 30px; }
+
+  .products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .product-card {
+    border: 1px solid var(--panel-border);
+    border-radius: 5px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color .15s;
+    background: #0f1613;
+  }
+  .product-card:hover { border-color: var(--accent-dim); }
+  .product-card.selected { border-color: var(--accent); background: #10231a; }
+  .product-card .pname { font-size: 12.5px; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
+  .product-card .pmeta { font-size: 11px; color: var(--ink-dim); display: flex; justify-content: space-between; }
+  .product-card .pqty { margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+  .product-card .pqty button {
+    width: 20px; height: 20px; border-radius: 3px;
+    border: 1px solid var(--panel-border); background: transparent; color: var(--ink);
+    cursor: pointer; font-family: var(--mono);
+  }
+  .product-card .pqty span { min-width: 16px; text-align: center; font-size: 12px; }
+
+  .empty-note { font-size: 12px; color: var(--ink-dim); font-style: italic; }
+
+  form-row, .form-row {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .field { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.04em; }
+  .field input {
+    background: #0f1613;
+    border: 1px solid var(--panel-border);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 4px;
+  }
+  .field input:focus { outline: none; border-color: var(--accent); }
+
+  button.action {
+    background: var(--accent);
+    color: #06120c;
+    border: none;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.02em;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  button.action:hover { background: #6cf0b8; }
+  button.action:disabled {
+    background: var(--panel-border);
+    color: var(--ink-dim);
+    cursor: not-allowed;
+  }
+  button.action.secondary {
+    background: transparent;
+    border: 1px solid var(--accent-dim);
+    color: var(--accent);
+  }
+  button.action.secondary:hover { background: #10231a; }
+
+  .order-id-display {
+    font-size: 12px;
+    color: var(--ink-dim);
+    margin-top: 10px;
+  }
+  .order-id-display b { color: var(--accent); }
+
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .badge.pending { background: #3a2f0f; color: var(--warn); }
+  .badge.paid { background: #10321f; color: var(--accent); }
+  .badge.expired, .badge.canceled { background: #3a1414; color: var(--err); }
+
+  .log-panel {
+    background: #0a0f0d;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    max-height: 260px;
+    overflow-y: auto;
+    font-size: 11.5px;
+  }
+  .log-entry {
+    padding: 5px 0;
+    border-bottom: 1px solid #182019;
+    display: flex;
+    gap: 10px;
+  }
+  .log-entry:last-child { border-bottom: none; }
+  .log-time { color: var(--ink-dim); flex-shrink: 0; }
+  .log-msg { flex: 1; word-break: break-word; }
+  .log-msg.err { color: var(--err); }
+  .log-msg.ok { color: var(--accent); }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>console<span>://</span>checkout-test</h1>
+    <div class="base-url">
+      <span id="apiStatus"><span class="status-dot" id="statusDot"></span>API</span>
+      <input id="baseUrl" type="text" value="" placeholder="https://seu-app.onrender.com">
+      <button class="action secondary" style="margin:0; padding:6px 10px;" id="btnTestApi">testar</button>
+    </div>
+  </header>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">1</div><div class="step-title">Selecionar produtos</div></div>
+    <div class="step-desc">Carrega de GET /api/products — clique num produto pra adicionar ao pedido</div>
+    <div id="products" class="products"><div class="empty-note">clique em "testar" acima, ou "recarregar" abaixo, pra carregar os produtos</div></div>
+    <button class="action secondary" style="margin-top:12px;" id="btnReloadProducts">recarregar produtos</button>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">2</div><div class="step-title">Criar pedido</div></div>
+    <div class="step-desc">POST /api/orders — com os itens selecionados acima</div>
+    <div class="form-row">
+      <div class="field">
+        <label>nome do cliente</label>
+        <input id="custName" type="text" value="Cliente Teste">
+      </div>
+      <div class="field">
+        <label>email do cliente</label>
+        <input id="custEmail" type="text" value="teste@teste.com">
+      </div>
+    </div>
+    <button class="action" id="btnCreateOrder">criar pedido</button>
+    <div class="order-id-display" id="orderDisplay"></div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">3</div><div class="step-title">Ir para o checkout</div></div>
+    <div class="step-desc">POST /api/payment/create-checkout — abre a página do Stripe em nova aba (use o cartão 4242 4242 4242 4242)</div>
+    <button class="action" id="btnCheckout" disabled>gerar link de checkout</button>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">4</div><div class="step-title">Conferir status do pedido</div></div>
+    <div class="step-desc">GET /api/orders/:id — depois de pagar, o webhook deve virar o status pra "paid"</div>
+    <button class="action" id="btnRefresh" disabled>consultar status</button>
+    <div id="orderStatusResult" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="step-num">·</div><div class="step-title">Log de requisições</div></div>
+    <div class="log-panel" id="log"></div>
+  </div>
+
+</div>
+
+<script>
+let selectedItems = {}; // product_id -> { product, qty }
+let currentOrderId = null;
+let products = [];
+
+const $ = id => document.getElementById(id);
+
+function getBase() {
+  const v = $('baseUrl').value.trim();
+  return v ? v.replace(/\/$/, '') : '';
+}
+
+function log(msg, type = '') {
+  const time = new Date().toLocaleTimeString('pt-BR');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg ${type}">${msg}</span>`;
+  $('log').prepend(entry);
+}
+
+async function checkHealth() {
+  try {
+    const res = await fetch(getBase() + '/api/health');
+    const data = await res.json();
+    $('statusDot').className = 'status-dot ok';
+    log(`GET /api/health → 200 — ${JSON.stringify(data)}`, 'ok');
+    loadProducts();
+  } catch (e) {
+    $('statusDot').className = 'status-dot bad';
+    log(`GET /api/health falhou — ${e.message}`, 'err');
+  }
+}
+
+async function loadProducts() {
+  try {
+    const res = await fetch(getBase() + '/api/products');
+    if (!res.ok) throw new Error('status ' + res.status);
+    products = await res.json();
+    log(`GET /api/products → 200 — ${products.length} produto(s)`, 'ok');
+    renderProducts();
+  } catch (e) {
+    log(`GET /api/products falhou — ${e.message}`, 'err');
+    $('products').innerHTML = '<div class="empty-note">falha ao carregar. confira a URL base e o CORS.</div>';
+  }
+}
+
+function renderProducts() {
+  const el = $('products');
+  if (!products.length) {
+    el.innerHTML = '<div class="empty-note">nenhum produto ativo encontrado</div>';
+    return;
+  }
+  el.innerHTML = '';
+  products.forEach(p => {
+    const qty = selectedItems[p.id]?.qty || 0;
+    const card = document.createElement('div');
+    card.className = 'product-card' + (qty > 0 ? ' selected' : '');
+    card.innerHTML = `
+      <div class="pname">${p.name}</div>
+      <div class="pmeta"><span>R$ ${(p.price / 100).toFixed(2)}</span><span>estq: ${p.stock}</span></div>
+      <div class="pqty">
+        <button type="button" data-action="dec">−</button>
+        <span>${qty}</span>
+        <button type="button" data-action="inc">+</button>
+      </div>
+    `;
+    card.querySelector('[data-action="dec"]').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      changeQty(p.id, -1);
+    });
+    card.querySelector('[data-action="inc"]').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      changeQty(p.id, 1);
+    });
+    el.appendChild(card);
+  });
+}
+
+function changeQty(productId, delta) {
+  const product = products.find(p => p.id === productId);
+  const current = selectedItems[productId]?.qty || 0;
+  const next = Math.max(0, Math.min(product.stock, current + delta));
+  if (next === 0) {
+    delete selectedItems[productId];
+  } else {
+    selectedItems[productId] = { product, qty: next };
+  }
+  renderProducts();
+}
+
+async function createOrder() {
+  const items = Object.values(selectedItems).map(({ product, qty }) => ({
+    product_id: product.id,
+    quantity: qty
+  }));
+
+  if (items.length === 0) {
+    log('selecione pelo menos um produto antes de criar o pedido', 'err');
+    return;
+  }
+
+  const body = {
+    customer_name: $('custName').value,
+    customer_email: $('custEmail').value,
+    items
+  };
+
+  try {
+    const res = await fetch(getBase() + '/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || ('status ' + res.status));
+
+    currentOrderId = data.order.id;
+    log(`POST /api/orders → 201 — pedido #${currentOrderId} criado (total: R$ ${(data.order.total / 100).toFixed(2)})`, 'ok');
+    $('orderDisplay').innerHTML = `pedido criado: <b>#${currentOrderId}</b> — status: ${data.order.status}`;
+    $('btnCheckout').disabled = false;
+    $('btnRefresh').disabled = false;
+    $('orderStatusResult').innerHTML = '';
+  } catch (e) {
+    log(`POST /api/orders falhou — ${e.message}`, 'err');
+  }
+}
+
+async function goToCheckout() {
+  if (!currentOrderId) return;
+  try {
+    const res = await fetch(getBase() + '/api/payment/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: currentOrderId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || ('status ' + res.status));
+
+    log(`POST /api/payment/create-checkout → 200 — abrindo checkout do pedido #${currentOrderId}`, 'ok');
+    window.open(data.checkout_url, '_blank');
+  } catch (e) {
+    log(`POST /api/payment/create-checkout falhou — ${e.message}`, 'err');
+  }
+}
+
+async function checkOrderStatus() {
+  if (!currentOrderId) return;
+  try {
+    const res = await fetch(getBase() + '/api/orders/' + currentOrderId);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || ('status ' + res.status));
+
+    const status = data.order.status;
+    log(`GET /api/orders/${currentOrderId} → 200 — status: ${status}`, 'ok');
+    $('orderStatusResult').innerHTML = `
+      pedido #${data.order.id} — <span class="badge ${status}">${status}</span><br>
+      <span style="color:var(--ink-dim)">stripe_session_id: ${data.order.stripe_session_id || '—'}</span>
+    `;
+  } catch (e) {
+    log(`GET /api/orders/${currentOrderId} falhou — ${e.message}`, 'err');
+  }
+}
+// 7777777777
+// tenta usar a própria origem como base, se a página for servida pelo backend
+window.addEventListener('DOMContentLoaded', () => {
+  $('baseUrl').value = window.location.origin.startsWith('http') && window.location.protocol !== 'file:'
+    ? window.location.origin
+    : '';
+
+  $('btnTestApi').addEventListener('click', checkHealth);
+  $('btnReloadProducts').addEventListener('click', loadProducts);
+  $('btnCreateOrder').addEventListener('click', createOrder);
+  $('btnCheckout').addEventListener('click', goToCheckout);
+  $('btnRefresh').addEventListener('click', checkOrderStatus);
+});
+</script>
+</body>
+</html>

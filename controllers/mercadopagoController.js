@@ -20,7 +20,7 @@ const mercadopagoController = {
   async listarProdutos(req, res) {
     try {
       const resultado = await pool.query(
-        `SELECT id, nome, descricao, preco, estoque FROM produtos WHERE ativo = TRUE ORDER BY nome`
+        `SELECT id, nome, descricao, preco, estoque, imagem_url FROM produtos WHERE ativo = TRUE ORDER BY nome`
       );
       return res.status(200).json(resultado.rows);
     } catch (erro) {
