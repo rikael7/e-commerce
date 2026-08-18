@@ -221,14 +221,12 @@
     vertical-align: middle;
   }
   tbody tr:last-child td{ border-bottom: none; }
-  tbody tr:hover{ background: var(--paper); }
   tbody tr.inativo{ opacity: 0.45; }
 
   .cel-nome .nome{ font-weight: 600; }
   .cel-nome .descricao{ font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
-  .cel-preco, .cel-valor{ font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
-  .cel-estoque, .cel-id, .cel-payment{ font-family: 'IBM Plex Mono', monospace; }
-  .cel-id, .cel-payment{ color: var(--ink-soft); font-size: 12px; }
+  .cel-preco{ font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  .cel-estoque, .cel-id{ font-family: 'IBM Plex Mono', monospace; }
 
   .tag-inativo{
     font-family: 'IBM Plex Mono', monospace;
@@ -252,7 +250,7 @@
   }
   .link-acao.excluir{ color: var(--stamp); }
 
-  /* ---- badges de status (pedidos) ---- */
+  /* ---- filtros pedidos ---- */
   .filtros{ display:flex; gap: 6px; flex-wrap: wrap; }
   .filtro-btn{
     font-family: 'IBM Plex Mono', monospace;
@@ -298,6 +296,78 @@
     text-align: center;
   }
   .estado.erro{ color: var(--stamp); }
+
+  /* ---- linha de pedido clicável + detalhe em cascata ---- */
+  .linha-pedido{ cursor: pointer; }
+  .linha-pedido:hover{ background: var(--paper); }
+  .linha-pedido.aberta{ background: var(--paper); }
+
+  .cel-toggle{ width: 22px; text-align: center; }
+  .seta{
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink-soft);
+    transition: transform 0.18s ease;
+  }
+  .linha-pedido.aberta .seta{ transform: rotate(90deg); }
+
+  .linha-detalhe td{
+    padding: 0;
+    border-bottom: 1px solid var(--paper-dark);
+  }
+  .detalhe-conteudo{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.22s ease, padding 0.22s ease;
+    background: var(--paper);
+  }
+  .linha-detalhe.aberta .detalhe-conteudo{
+    max-height: 900px;
+    padding: 16px 18px;
+  }
+
+  .detalhe-secao{ margin-bottom: 16px; }
+  .detalhe-secao:last-child{ margin-bottom: 0; }
+  .detalhe-titulo{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--stamp);
+    margin-bottom: 8px;
+  }
+
+  .detalhe-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px 20px;
+  }
+
+  .detalhe-itens{ display: grid; gap: 6px; }
+  .item-linha{
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .item-linha:last-child{ border-bottom: none; }
+  .detalhe-item .rotulo{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+  }
+  .detalhe-item .valor{
+    font-size: 13.5px;
+    word-break: break-word;
+  }
+  .detalhe-item .valor.mono{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+  }
 
   :focus-visible{ outline: 2px solid var(--stamp-soft); outline-offset: 2px; }
 </style>
@@ -401,6 +471,17 @@
 
   function formatarMoeda(v){
     return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  function formatarData(iso){
+    if(!iso) return '—';
+    return new Date(iso).toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+  function formatarDataSimples(iso){
+    if(!iso) return '—';
+    return new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   }
   function escapeHtml(str){
     const div = document.createElement('div');
@@ -616,6 +697,7 @@
   let pedidos = [];
   let filtroPedidoAtual = 'todos';
   let pedidosCarregados = false;
+  let pedidoAbertoId = null; // guarda qual pedido está expandido entre re-renders
 
   function classeBadge(status){
     if(!status) return 'outro';
@@ -662,23 +744,142 @@
 
     contagemPedidosEl.textContent = filtrados.length + ' de ' + pedidos.length;
 
-    const linhas = filtrados.map((p) => `
-      <tr>
-        <td class="cel-id">#${p.id}</td>
-        <td class="cel-valor">${formatarMoeda(p.valor_total)}</td>
-        <td><span class="badge ${classeBadge(p.status_pagamento)}">${p.status_pagamento || 'sem status'}</span></td>
-        <td class="cel-payment">${p.payment_id || '—'}</td>
-      </tr>
-    `).join('');
+    const linhas = filtrados.map((p) => {
+      const aberta = String(p.id) === String(pedidoAbertoId);
+      return `
+        <tr class="linha-pedido ${aberta ? 'aberta' : ''}" data-id="${p.id}">
+          <td class="cel-toggle"><span class="seta">▶</span></td>
+          <td class="cel-id">#${p.id}</td>
+          <td class="cel-nome">
+            <div class="nome">${escapeHtml(p.nome_completo || '—')}</div>
+            <div class="descricao">${escapeHtml(p.email || '')}</div>
+          </td>
+          <td class="cel-preco">${formatarMoeda(p.valor_total)}</td>
+          <td><span class="badge ${classeBadge(p.status_pagamento)}">${p.status_pagamento || 'sem status'}</span></td>
+        </tr>
+        <tr class="linha-detalhe ${aberta ? 'aberta' : ''}" data-detalhe-id="${p.id}">
+          <td colspan="5">
+            <div class="detalhe-conteudo">
+              <div class="detalhe-secao">
+                <div class="detalhe-titulo">Comprador</div>
+                <div class="detalhe-grid">
+                  <div class="detalhe-item">
+                    <div class="rotulo">CPF/CNPJ</div>
+                    <div class="valor mono">${escapeHtml(p.cpf_cnpj || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Telefone</div>
+                    <div class="valor">${escapeHtml(p.telefone || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Data de nascimento</div>
+                    <div class="valor">${formatarDataSimples(p.data_nascimento)}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalhe-secao">
+                <div class="detalhe-titulo">Endereço de entrega</div>
+                <div class="detalhe-grid">
+                  <div class="detalhe-item">
+                    <div class="rotulo">CEP</div>
+                    <div class="valor mono">${escapeHtml(p.cep || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">País</div>
+                    <div class="valor">${escapeHtml(p.pais || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Cidade / Estado</div>
+                    <div class="valor">${escapeHtml(p.cidade || '—')}${p.estado ? ' / ' + escapeHtml(p.estado) : ''}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Bairro</div>
+                    <div class="valor">${escapeHtml(p.bairro || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Rua / Número</div>
+                    <div class="valor">${escapeHtml(p.rua || '—')}, ${escapeHtml(p.numero || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Complemento</div>
+                    <div class="valor">${escapeHtml(p.complemento || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Ponto de referência</div>
+                    <div class="valor">${escapeHtml(p.ponto_referencia || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Destinatário</div>
+                    <div class="valor">${escapeHtml(p.nome_destinatario || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Telefone de entrega</div>
+                    <div class="valor">${escapeHtml(p.telefone_entrega || '—')}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detalhe-secao">
+                <div class="detalhe-titulo">Itens do pedido</div>
+                <div class="detalhe-itens">
+                  ${
+                    Array.isArray(p.itens) && p.itens.length > 0
+                      ? p.itens.map((item) => `
+                          <div class="item-linha">
+                            <span>${escapeHtml(item.titulo)} × ${item.quantidade}</span>
+                            <span class="mono">${formatarMoeda(item.preco)}</span>
+                          </div>
+                        `).join('')
+                      : '<div class="detalhe-item"><div class="valor">itens não disponíveis</div></div>'
+                  }
+                </div>
+              </div>
+
+              <div class="detalhe-secao">
+                <div class="detalhe-grid">
+                  <div class="detalhe-item">
+                    <div class="rotulo">Payment ID</div>
+                    <div class="valor mono">${escapeHtml(p.payment_id || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Preference ID</div>
+                    <div class="valor mono">${escapeHtml(p.preference_id || '—')}</div>
+                  </div>
+                  <div class="detalhe-item">
+                    <div class="rotulo">Criado em</div>
+                    <div class="valor mono">${formatarData(p.criado_em)}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
 
     pedidosWrapEl.innerHTML = `
       <table>
         <thead>
-          <tr><th>Pedido</th><th>Valor</th><th>Status</th><th>ID do pagamento</th></tr>
+          <tr>
+            <th></th>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Valor</th>
+            <th>Status</th>
+          </tr>
         </thead>
         <tbody>${linhas}</tbody>
       </table>
     `;
+
+    pedidosWrapEl.querySelectorAll('.linha-pedido').forEach((linha) => {
+      linha.addEventListener('click', () => {
+        const id = linha.dataset.id;
+        pedidoAbertoId = (pedidoAbertoId === id) ? null : id;
+        renderizarPedidos();
+      });
+    });
   }
 
   filtrosPedidosEl.addEventListener('click', (evento) => {
@@ -688,6 +889,7 @@
     filtrosPedidosEl.querySelectorAll('.filtro-btn').forEach((b) => b.classList.remove('ativo'));
     botao.classList.add('ativo');
     filtroPedidoAtual = botao.dataset.status;
+    pedidoAbertoId = null;
     renderizarPedidos();
   });
 
