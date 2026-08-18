@@ -32,84 +32,207 @@ const mercadopagoController = {
   // Cria um pedido a partir dos itens escolhidos pelo usuário
   // Body do user esperado: { itens: [{ produtoId, quantidade }] }
   // O preço nunca vem do front — é sempre buscado na tabela produtos
-  async criarPedido(req, res) {
-    const { itens } = req.body;
+  // async criarPedido(req, res) {
+  //   const { itens } = req.body;
 
-    if (!itens || !Array.isArray(itens) || itens.length === 0) {
-      return res.status(400).json({ erro: 'Nenhum item foi selecionado.' });
+  //   if (!itens || !Array.isArray(itens) || itens.length === 0) {
+  //     return res.status(400).json({ erro: 'Nenhum item foi selecionado.' });
+  //   }
+
+  //   const conexao = await pool.connect();
+
+  //   try {
+  //     await conexao.query('BEGIN');
+
+  //     const produtoIds = itens.map((item) => item.produtoId);
+  //     const resultadoProdutos = await conexao.query(
+  //       `SELECT id, nome, preco, estoque FROM produtos WHERE id = ANY($1::int[]) AND ativo = TRUE`,
+  //       [produtoIds]
+  //     );
+
+  //     const produtosEncontrados = resultadoProdutos.rows;
+
+  //     if (produtosEncontrados.length !== produtoIds.length) {
+  //       await conexao.query('ROLLBACK');
+  //       return res.status(400).json({ erro: 'Um ou mais produtos não existem ou estão indisponíveis.' });
+  //     }
+
+  //     let valorTotal = 0;
+  //     const itensParaInserir = itens.map((item) => {
+  //       const produto = produtosEncontrados.find((p) => p.id === item.produtoId);
+
+  //       if (item.quantidade > produto.estoque) {
+  //         throw new Error(`Estoque insuficiente para "${produto.nome}".`);
+  //       }
+
+  //       const subtotal = Number(produto.preco) * Number(item.quantidade);
+  //       valorTotal += subtotal;
+
+  //       return {
+  //         produtoId: produto.id,
+  //         titulo: produto.nome,
+  //         quantidade: item.quantidade,
+  //         preco: produto.preco,
+  //       };
+  //     });
+
+  //     const resultadoPedido = await conexao.query(
+  //       `INSERT INTO pedidos (valor_total, status_pagamento) VALUES ($1, 'pendente') RETURNING id`,
+  //       [valorTotal]
+  //     );
+  //     const pedidoId = resultadoPedido.rows[0].id;
+
+  //     for (const item of itensParaInserir) {
+  //       await conexao.query(
+  //         `INSERT INTO pedido_itens (pedido_id, produto_id, titulo, quantidade, preco)
+  //          VALUES ($1, $2, $3, $4, $5)`,
+  //         [pedidoId, item.produtoId, item.titulo, item.quantidade, item.preco]
+  //       );
+
+  //       await conexao.query(
+  //         `UPDATE produtos SET estoque = estoque - $1 WHERE id = $2`,
+  //         [item.quantidade, item.produtoId]
+  //       );
+  //     }
+
+  //     await conexao.query('COMMIT');
+
+  //     return res.status(201).json({
+  //       pedidoId,
+  //       valorTotal,
+  //       itens: itensParaInserir,
+  //     });
+  //   } catch (erro) {
+  //     await conexao.query('ROLLBACK');
+  //     console.error('Erro ao criar pedido:', erro);
+  //     return res.status(400).json({ erro: erro.message || 'Erro ao criar pedido.' });
+  //   } finally {
+  //     conexao.release();
+  //   }
+  // },
+// Cria um pedido a partir dos itens do carrinho + dados de contato/entrega
+// Body esperado: {
+//   itens: [{ produtoId, quantidade }],
+//   nomeCompleto, email, cpfCnpj, telefone, dataNascimento,
+//   cep, pais, estado, cidade, bairro, rua, numero, complemento, pontoReferencia,
+//   nomeDestinatario, telefoneEntrega
+// }
+// O preço nunca vem do front — é sempre buscado na tabela produtos
+async criarPedido(req, res) {
+  const {
+    itens,
+    nomeCompleto, email, cpfCnpj, telefone, dataNascimento,
+    cep, pais, estado, cidade, bairro, rua, numero,
+    complemento, pontoReferencia, nomeDestinatario, telefoneEntrega
+  } = req.body;
+
+  if (!itens || !Array.isArray(itens) || itens.length === 0) {
+    return res.status(400).json({ erro: 'Nenhum item foi selecionado.' });
+  }
+
+  const camposObrigatorios = {
+    nomeCompleto, email, cpfCnpj, telefone,
+    cep, pais, estado, cidade, bairro, rua, numero,
+    nomeDestinatario, telefoneEntrega
+  };
+  for (const [campo, valor] of Object.entries(camposObrigatorios)) {
+    if (!valor || String(valor).trim() === '') {
+      return res.status(400).json({ erro: `O campo "${campo}" é obrigatório.` });
     }
+  }
 
-    const conexao = await pool.connect();
+  const conexao = await pool.connect();
 
-    try {
-      await conexao.query('BEGIN');
+  try {
+    await conexao.query('BEGIN');
 
-      const produtoIds = itens.map((item) => item.produtoId);
-      const resultadoProdutos = await conexao.query(
-        `SELECT id, nome, preco, estoque FROM produtos WHERE id = ANY($1::int[]) AND ativo = TRUE`,
-        [produtoIds]
-      );
+    const produtoIds = itens.map((item) => item.produtoId);
+    const resultadoProdutos = await conexao.query(
+      `SELECT id, nome, preco, estoque FROM produtos WHERE id = ANY($1::int[]) AND ativo = TRUE`,
+      [produtoIds]
+    );
 
-      const produtosEncontrados = resultadoProdutos.rows;
+    const produtosEncontrados = resultadoProdutos.rows;
 
-      if (produtosEncontrados.length !== produtoIds.length) {
-        await conexao.query('ROLLBACK');
-        return res.status(400).json({ erro: 'Um ou mais produtos não existem ou estão indisponíveis.' });
-      }
-
-      let valorTotal = 0;
-      const itensParaInserir = itens.map((item) => {
-        const produto = produtosEncontrados.find((p) => p.id === item.produtoId);
-
-        if (item.quantidade > produto.estoque) {
-          throw new Error(`Estoque insuficiente para "${produto.nome}".`);
-        }
-
-        const subtotal = Number(produto.preco) * Number(item.quantidade);
-        valorTotal += subtotal;
-
-        return {
-          produtoId: produto.id,
-          titulo: produto.nome,
-          quantidade: item.quantidade,
-          preco: produto.preco,
-        };
-      });
-
-      const resultadoPedido = await conexao.query(
-        `INSERT INTO pedidos (valor_total, status_pagamento) VALUES ($1, 'pendente') RETURNING id`,
-        [valorTotal]
-      );
-      const pedidoId = resultadoPedido.rows[0].id;
-
-      for (const item of itensParaInserir) {
-        await conexao.query(
-          `INSERT INTO pedido_itens (pedido_id, produto_id, titulo, quantidade, preco)
-           VALUES ($1, $2, $3, $4, $5)`,
-          [pedidoId, item.produtoId, item.titulo, item.quantidade, item.preco]
-        );
-
-        await conexao.query(
-          `UPDATE produtos SET estoque = estoque - $1 WHERE id = $2`,
-          [item.quantidade, item.produtoId]
-        );
-      }
-
-      await conexao.query('COMMIT');
-
-      return res.status(201).json({
-        pedidoId,
-        valorTotal,
-        itens: itensParaInserir,
-      });
-    } catch (erro) {
+    if (produtosEncontrados.length !== produtoIds.length) {
       await conexao.query('ROLLBACK');
-      console.error('Erro ao criar pedido:', erro);
-      return res.status(400).json({ erro: erro.message || 'Erro ao criar pedido.' });
-    } finally {
-      conexao.release();
+      return res.status(400).json({ erro: 'Um ou mais produtos não existem ou estão indisponíveis.' });
     }
-  },
+
+    let valorTotal = 0;
+    const itensParaInserir = itens.map((item) => {
+      const produto = produtosEncontrados.find((p) => p.id === item.produtoId);
+
+      if (item.quantidade > produto.estoque) {
+        throw new Error(`Estoque insuficiente para "${produto.nome}".`);
+      }
+
+      const subtotal = Number(produto.preco) * Number(item.quantidade);
+      valorTotal += subtotal;
+
+      return {
+        produtoId: produto.id,
+        titulo: produto.nome,
+        quantidade: item.quantidade,
+        preco: produto.preco,
+      };
+    });
+
+    const resultadoPedido = await conexao.query(
+      `INSERT INTO pedidos (
+         valor_total, status_pagamento,
+         nome_completo, email, cpf_cnpj, telefone, data_nascimento,
+         cep, pais, estado, cidade, bairro, rua, numero,
+         complemento, ponto_referencia, nome_destinatario, telefone_entrega,
+         criado_em
+       ) VALUES (
+         $1, 'pendente',
+         $2, $3, $4, $5, $6,
+         $7, $8, $9, $10, $11, $12, $13,
+         $14, $15, $16, $17,
+         NOW()
+       ) RETURNING id, criado_em`,
+      [
+        valorTotal,
+        nomeCompleto, email, cpfCnpj, telefone, dataNascimento || null,
+        cep, pais, estado.toUpperCase(), cidade, bairro, rua, numero,
+        complemento || null, pontoReferencia || null, nomeDestinatario, telefoneEntrega
+      ]
+    );
+    const pedidoId = resultadoPedido.rows[0].id;
+    const criadoEm = resultadoPedido.rows[0].criado_em;
+
+    for (const item of itensParaInserir) {
+      await conexao.query(
+        `INSERT INTO pedido_itens (pedido_id, produto_id, titulo, quantidade, preco)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [pedidoId, item.produtoId, item.titulo, item.quantidade, item.preco]
+      );
+
+      await conexao.query(
+        `UPDATE produtos SET estoque = estoque - $1 WHERE id = $2`,
+        [item.quantidade, item.produtoId]
+      );
+    }
+
+    await conexao.query('COMMIT');
+
+    return res.status(201).json({
+      pedidoId,
+      valorTotal,
+      criadoEm,
+      itens: itensParaInserir,
+    });
+  } catch (erro) {
+    await conexao.query('ROLLBACK');
+    console.error('Erro ao criar pedido:', erro);
+    return res.status(400).json({ erro: erro.message || 'Erro ao criar pedido.' });
+  } finally {
+    conexao.release();
+  }
+},
+
+
 
   // Cria uma preferência de pagamento e devolve o link de checkout (init_point)
   // O front manda só o pedidoId — os itens e preços vêm do banco (pedido_itens),
