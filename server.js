@@ -147,6 +147,19 @@ app.get('/checkout', (req, res) => {
 });
 
 
+app.get('/pagamento/sucesso', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'loja.html'));
+});
+
+app.get('/pagamento/falha', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'loja.html'));
+});
+
+app.get('/pagamento/pendente', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'loja.html'));
+});
+
+
 
 app.get('/caixa', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));

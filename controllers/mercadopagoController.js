@@ -148,7 +148,7 @@ const mercadopagoController = {
             pending: `${process.env.APP_URL}/pagamento/pendente`,
           },
           auto_return: 'approved',
-          notification_url: `${process.env.APP_URL}/api/mercadopago/webhook`,
+          notification_url: `${process.env.APP_URL}api/mercadopago/webhook`,
         },
       });
 
