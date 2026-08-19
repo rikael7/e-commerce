@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Produto</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9;">
+
+  <!-- Header -->
+  <header style="background: #222; color: white; padding: 15px;">
+    <h1 style="margin: 0;">Minha Loja</h1>
+  </header>
+
+  <!-- Container principal -->
+  <main style="max-width: 1200px; margin: 20px auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+
+    <!-- Produto -->
+    <div id="produto" style="display: flex; gap: 40px;">
+      <!-- Conteúdo será preenchido via JS -->
+    </div>
+
+    <!-- Descrição -->
+    <section id="descricao" style="margin-top: 40px;"></section>
+
+    <!-- Produtos relacionados -->
+    <section id="relacionados" style="margin-top: 40px;"></section>
+
+    <!-- Avaliações -->
+    <section id="avaliacoes" style="margin-top: 40px;"></section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer style="background: #222; color: white; text-align: center; padding: 15px; margin-top: 40px;">
+    <p>&copy; 2026 Minha Loja - Todos os direitos reservados</p>
+  </footer>
+
+  <script>
+    // Simulação de "banco de dados"
+    const produtosDB = {
+      "1": {
+        nome: "Bancada Profissional Fechada Duas Portas PRESTO – 03.015",
+        preco: "R$ 2.749,90",
+        imagemPrincipal: "imagem-principal.jpg",
+        imagens: ["thumb1.jpg", "thumb2.jpg", "thumb3.jpg"],
+        descricao: "Bancada feita em MDF 30 mm, pintura epóxi preta, pés ajustáveis.",
+        especificacoes: {
+          "Material do tampo": "MDF",
+          "Quantidade de portas": "2",
+          "Acabamento da pintura": "Epóxi",
+          "Altura": "90 cm",
+          "Largura": "150 cm",
+          "Profundidade": "60 cm",
+          "Peso": "58 kg"
+        },
+        relacionados: [
+          { nome: "Armário de Ferramentas", preco: "R$ 1.299,90", imagem: "relacionado1.jpg" },
+          { nome: "Plaina Elétrica", preco: "R$ 599,90", imagem: "relacionado2.jpg" }
+        ],
+        avaliacoes: [
+          { usuario: "João", comentario: "Excelente qualidade, recomendo!", nota: 5 },
+          { usuario: "Maria", comentario: "Produto muito resistente e bem acabado.", nota: 5 }
+        ]
+      }
+    };
+
+    // Pega query param "id"
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (id && produtosDB[id]) {
+      const produto = produtosDB[id];
+
+      // Render produto
+      document.getElementById("produto").innerHTML = `
+        <div style="flex: 1;">
+          <img src="${produto.imagemPrincipal}" alt="${produto.nome}" style="width: 100%; border: 1px solid #ddd;">
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            ${produto.imagens.map(img => `<img src="${img}" style="width: 80px; border: 1px solid #ddd;">`).join("")}
+          </div>
+        </div>
+        <div style="flex: 1;">
+          <h2 style="margin: 0;">${produto.nome}</h2>
+          <p style="font-size: 24px; color: green; margin: 10px 0;">${produto.preco}</p>
+          <button style="background: green; color: white; padding: 12px 20px; border: none; cursor: pointer; margin-right: 10px;">
+            Comprar Agora
+          </button>
+          <button style="background: orange; color: white; padding: 12px 20px; border: none; cursor: pointer;">
+            Adicionar ao Carrinho
+          </button>
+        </div>
+      `;
+
+      // Render descrição
+      document.getElementById("descricao").innerHTML = `
+        <h3>Descrição</h3>
+        <p>${produto.descricao}</p>
+        <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+          ${Object.entries(produto.especificacoes).map(([k,v]) => `
+            <tr><td style="border: 1px solid #ddd; padding: 8px;">${k}</td><td style="border: 1px solid #ddd; padding: 8px;">${v}</td></tr>
+          `).join("")}
+        </table>
+      `;
+
+      // Render relacionados
+      document.getElementById("relacionados").innerHTML = `
+        <h3>Quem viu, viu também</h3>
+        <div style="display: flex; gap: 20px;">
+          ${produto.relacionados.map(r => `
+            <div style="border: 1px solid #ddd; padding: 10px; text-align: center; flex: 1;">
+              <img src="${r.imagem}" alt="${r.nome}" style="width: 100px;">
+              <p>${r.nome}</p>
+              <span style="color: green;">${r.preco}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+
+      // Render avaliações
+      document.getElementById("avaliacoes").innerHTML = `
+        <h3>Avaliações</h3>
+        ${produto.avaliacoes.map(a => `
+          <div style="border-top: 1px solid #ddd; padding: 10px 0;">
+            <strong>${a.usuario}</strong>
+            <p>${a.comentario}</p>
+            <span>⭐ ${a.nota}</span>
+          </div>
+        `).join("")}
+      `;
+    } else {
+      document.getElementById("produto").innerHTML = "<p>Produto não encontrado.</p>";
+    }
+  </script>
+
+</body>
+</html>

@@ -138,6 +138,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'loja.html'));
 });
 
+app.get('/produto', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'produto.html'));
+});
+
+
 app.get('/cart', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'singlecheckout.html'));
 });
