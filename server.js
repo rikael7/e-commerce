@@ -147,9 +147,6 @@ app.get('/cart', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'singlecheckout.html'));
 });
 
-// app.get('/checkout', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'views', 'checkout.html'));
-// });
 
 
 app.get('/pagamento/sucesso', (req, res) => {
@@ -163,7 +160,6 @@ app.get('/pagamento/falha', (req, res) => {
 app.get('/pagamento/pendente', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'loja.html'));
 });
-
 
 
 app.get('/caixa', (req, res) => {
